@@ -1,5 +1,4 @@
-import { useState } from "react";
-import QuickNavigatorModal from "./QuickNavigatorModal.jsx";
+import { useEffect, useRef, useState } from "react";
 import {
   MEMBER_HIGHLIGHTS,
   MEMBER_PEOPLE,
@@ -8,10 +7,6 @@ import { getQuickNavigatorRecommendations } from "../lib/quickNavigator.js";
 import {
   consumeWelcomeBanner,
   getDemoMember,
-  getQuickNavigatorAnswers,
-  markQuickNavigatorSeen,
-  resetQuickNavigator,
-  saveQuickNavigatorAnswers,
   shouldShowQuickNavigator,
 } from "../lib/demoSession.js";
 
@@ -19,19 +14,30 @@ function Icon({ name }) {
   return <span className="material-icons workflow-icon">{name}</span>;
 }
 
-export default function MemberAreaPage({ onNavigateHome, onNavigateRegistration }) {
+export default function MemberAreaPage({
+  onNavigateHome,
+  onNavigateRegistration,
+  onOpenQuickNavigator,
+  onRestartQuickNavigator,
+  quickNavAnswers,
+}) {
   const [member] = useState(() => getDemoMember());
-  const [quickNavAnswers, setQuickNavAnswers] = useState(() => getQuickNavigatorAnswers());
   const [showWelcomeBanner, setShowWelcomeBanner] = useState(() => {
     const currentMember = getDemoMember();
     return currentMember ? consumeWelcomeBanner() : false;
   });
-  const [showQuickNavigator, setShowQuickNavigator] = useState(() => {
-    const currentMember = getDemoMember();
-    return currentMember ? shouldShowQuickNavigator() : false;
-  });
+  const hasAutoOpenedQuickNavigatorRef = useRef(false);
 
   const quickNavRecommendations = getQuickNavigatorRecommendations(quickNavAnswers);
+
+  useEffect(() => {
+    if (!member || hasAutoOpenedQuickNavigatorRef.current || !shouldShowQuickNavigator()) {
+      return;
+    }
+
+    hasAutoOpenedQuickNavigatorRef.current = true;
+    onOpenQuickNavigator();
+  }, [member, onOpenQuickNavigator]);
 
   if (!member) {
     return (
@@ -60,32 +66,8 @@ export default function MemberAreaPage({ onNavigateHome, onNavigateRegistration 
     );
   }
 
-  const handleQuickNavigatorClose = () => {
-    markQuickNavigatorSeen();
-    setShowQuickNavigator(false);
-  };
-
-  const handleQuickNavigatorComplete = (answers) => {
-    saveQuickNavigatorAnswers(answers);
-    setQuickNavAnswers(answers);
-    setShowQuickNavigator(false);
-  };
-
-  const handleQuickNavigatorRestart = () => {
-    resetQuickNavigator();
-    setShowQuickNavigator(true);
-  };
-
   return (
     <div className="page-shell page-shell--members">
-      {showQuickNavigator && (
-        <QuickNavigatorModal
-          initialAnswers={quickNavAnswers}
-          onClose={handleQuickNavigatorClose}
-          onComplete={handleQuickNavigatorComplete}
-        />
-      )}
-
       <div className="member-dashboard">
         {showWelcomeBanner && (
           <div className="welcome-banner">
@@ -104,7 +86,7 @@ export default function MemberAreaPage({ onNavigateHome, onNavigateRegistration 
             <div className="personalized-start__top">
               <span className="personalized-start__badge">{quickNavRecommendations.badge}</span>
               <div className="personalized-start__actions">
-                <button className="button button--ghost" onClick={handleQuickNavigatorRestart} type="button">
+                <button className="button button--ghost" onClick={onRestartQuickNavigator} type="button">
                   <Icon name="restart_alt" />
                   <span>Quick Navigator</span>
                 </button>
@@ -178,7 +160,7 @@ export default function MemberAreaPage({ onNavigateHome, onNavigateRegistration 
                 <li>Relevante Inhalte auf Basis deiner aktuellen Absicht</li>
                 <li>Jederzeit erneut startbar, wenn sich dein Fokus ändert</li>
               </ul>
-              <button className="button button--primary" onClick={handleQuickNavigatorRestart} type="button">
+              <button className="button button--primary" onClick={onRestartQuickNavigator} type="button">
                 <Icon name="flag" />
                 <span>Quick Navigator starten</span>
               </button>

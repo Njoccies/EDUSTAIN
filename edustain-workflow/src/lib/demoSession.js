@@ -46,9 +46,12 @@ export function markQuickNavigatorSeen() {
   localStorage.setItem(QUICK_NAVIGATOR_SEEN_KEY, "shown");
 }
 
-export function saveQuickNavigatorAnswers(answers) {
+export function saveQuickNavigatorAnswers(answers, options = {}) {
+  const { markSeen = true } = options;
   localStorage.setItem(QUICK_NAVIGATOR_ANSWERS_KEY, JSON.stringify(answers));
-  markQuickNavigatorSeen();
+  if (markSeen) {
+    markQuickNavigatorSeen();
+  }
 }
 
 export function getQuickNavigatorAnswers() {

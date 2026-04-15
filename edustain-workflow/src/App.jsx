@@ -1,9 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 import MemberAreaPage from "./components/MemberAreaPage.jsx";
+import QuickNavigatorModal from "./components/QuickNavigatorModal.jsx";
 import RegistrationPage from "./components/RegistrationPage.jsx";
 import WorkflowHeader from "./components/WorkflowHeader.jsx";
 import WebsiteHome from "./components/WebsiteHome.jsx";
 import { NAV_TABS } from "./data/workflowSiteContent.js";
+import {
+  getQuickNavigatorAnswers,
+  markQuickNavigatorSeen,
+  resetQuickNavigator,
+  saveQuickNavigatorAnswers,
+} from "./lib/demoSession.js";
 import ProjectsPlannerTab from "./ProjectsPlannerTab.jsx";
 
 function normalizePath(pathname) {
@@ -22,6 +29,9 @@ export default function EdustainConnect() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [pendingSectionId, setPendingSectionId] = useState(null);
   const [scrolled, setScrolled] = useState(false);
+  const [quickNavAnswers, setQuickNavAnswers] = useState(() => getQuickNavigatorAnswers());
+  const [quickNavigatorOpen, setQuickNavigatorOpen] = useState(false);
+  const [quickNavigatorSource, setQuickNavigatorSource] = useState("homepage");
 
   const welcomeRef = useRef(null);
   const registrationRef = useRef(null);
@@ -117,8 +127,44 @@ export default function EdustainConnect() {
     setPendingSectionId(selectedTab?.section ?? "welcome");
   };
 
+  const openQuickNavigator = (source, options = {}) => {
+    const { restart = false } = options;
+
+    if (restart) {
+      resetQuickNavigator();
+      setQuickNavAnswers(null);
+    }
+
+    setQuickNavigatorSource(source);
+    setQuickNavigatorOpen(true);
+  };
+
+  const handleQuickNavigatorClose = () => {
+    if (quickNavigatorSource === "member") {
+      markQuickNavigatorSeen();
+    }
+
+    setQuickNavigatorOpen(false);
+  };
+
+  const handleQuickNavigatorComplete = (answers) => {
+    const shouldMarkSeen = quickNavigatorSource === "member";
+
+    saveQuickNavigatorAnswers(answers, { markSeen: shouldMarkSeen });
+    setQuickNavAnswers(answers);
+    setQuickNavigatorOpen(false);
+  };
+
   return (
     <div className="workflow-app">
+      {quickNavigatorOpen && (
+        <QuickNavigatorModal
+          initialAnswers={quickNavAnswers}
+          onClose={handleQuickNavigatorClose}
+          onComplete={handleQuickNavigatorComplete}
+        />
+      )}
+
       <WorkflowHeader
         tabs={NAV_TABS}
         activeTab={activeTab}
@@ -144,6 +190,9 @@ export default function EdustainConnect() {
         <MemberAreaPage
           onNavigateHome={() => navigateTo("/")}
           onNavigateRegistration={() => navigateTo("/registrierung")}
+          onOpenQuickNavigator={() => openQuickNavigator("member")}
+          onRestartQuickNavigator={() => openQuickNavigator("member", { restart: true })}
+          quickNavAnswers={quickNavAnswers}
         />
       ) : activeTab === "projekte" ? (
         <ProjectsPlannerTab />
@@ -155,6 +204,7 @@ export default function EdustainConnect() {
           onOpenProjects={() => handleTabChange("projekte")}
           onOpenRegistration={() => navigateTo("/registrierung")}
           onOpenMembers={() => navigateTo("/mitgliederbereich")}
+          onOpenQuickNavigator={() => openQuickNavigator("homepage", { restart: true })}
         />
       )}
     </div>

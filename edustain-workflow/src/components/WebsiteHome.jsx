@@ -24,6 +24,7 @@ export default function WebsiteHome({
   onOpenProjects,
   onOpenRegistration,
   onOpenMembers,
+  onOpenQuickNavigator,
 }) {
   return (
     <div className="site-shell">
@@ -40,6 +41,10 @@ export default function WebsiteHome({
             <button className="button button--secondary" onClick={onOpenProjects} type="button">
               <Icon name="assignment" />
               <span>Projekte öffnen</span>
+            </button>
+            <button className="button button--secondary" onClick={onOpenQuickNavigator} type="button">
+              <Icon name="explore" />
+              <span>Quick Navigator</span>
             </button>
           </div>
         </div>
