@@ -46,19 +46,23 @@ export default function WebsiteHome({
       </section>
 
       <main className="site-main">
-        <section className="content-section" ref={welcomeRef} id="welcome">
-          <h2>Willkommen auf der Whole School Approach Vernetzungsplattform</h2>
-          <p>
-            Ihr möchtet eure Schule von einem Lernort zu einem nachhaltigen Lebensraum machen und
-            BNE im Whole School Approach umsetzen? Dann werdet Teil unserer digitalen WSA
-            Community!
-          </p>
-          <p>Diese Plattform</p>
-          <ul className="bullet-list">
-            {BENEFITS.map((item) => (
-              <li key={item}>{item}</li>
+        <section className="welcome-section" ref={welcomeRef} id="welcome">
+          <div className="welcome-section__intro">
+            <h2>Die Plattform für nachhaltige Schulentwicklung <span className="welcome-section__accent">(Whole School Approach)</span></h2>
+            <p>
+              Vernetzt euch mit anderen Schulen, findet Inspiration und setzt Bildung für
+              nachhaltige Entwicklung (BNE) Schritt für Schritt an eurer Schule um.
+            </p>
+          </div>
+          <div className="benefit-grid">
+            {BENEFITS.map((b) => (
+              <div className="benefit-card" key={b.title}>
+                <span className="benefit-card__icon material-icons">{b.icon}</span>
+                <h3 className="benefit-card__title">{b.title}</h3>
+                <p className="benefit-card__text">{b.text}</p>
+              </div>
             ))}
-          </ul>
+          </div>
         </section>
 
         <section className="content-section content-section--bordered" ref={registrationRef} id="registration">

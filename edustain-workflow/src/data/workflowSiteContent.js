@@ -6,13 +6,36 @@ export const NAV_TABS = [
 ];
 
 export const BENEFITS = [
-  "Vernetzt euch mit WSA Mitstreitenden aus ganz Deutschland",
-  "Gibt euch Orientierung und Inspiration wie ihr den WSA an eurer Schule wirkungsorientiert, systematisch und praxisnah umsetzt",
-  "Unterstützt euch dabei, euren eigenen Handlungsspielraum zu verstehen und eure eigene individuelle WSA Roadmap zu entwickeln und umzusetzen",
-  "Hilft euch dabei passende Projekte, Partner und Förderungen zu finden",
-  "Bietet euch einen geschützten Raum für Austausch von Best Practices & Fuck-Up Stories untereinander",
-  "Gibt eurer BNE Arbeit Sichtbarkeit",
-  "Ermöglicht messbare Evaluation, Reflexion und Steuerung des Fortschritts",
+  {
+    icon: "hub",
+    title: "Vernetzen",
+    text: "Vernetzt euch mit WSA Mitstreitenden aus ganz Deutschland.",
+  },
+  {
+    icon: "route",
+    title: "Orientieren",
+    text: "Orientierung und Inspiration, wie ihr den WSA an eurer Schule wirkungsorientiert, systematisch und praxisnah umsetzt.",
+  },
+  {
+    icon: "map",
+    title: "Roadmap entwickeln",
+    text: "Unterstützt euch dabei, euren Handlungsspielraum zu verstehen und eine individuelle WSA Roadmap zu entwickeln und umzusetzen.",
+  },
+  {
+    icon: "handshake",
+    title: "Passendes finden",
+    text: "Hilft euch dabei, passende Projekte, Partner und Förderungen zu finden.",
+  },
+  {
+    icon: "forum",
+    title: "Austauschraum",
+    text: "Bietet euch einen geschützten Raum für Austausch von Best Practices und Fuck-Up Stories untereinander.",
+  },
+  {
+    icon: "insights",
+    title: "Sichtbarkeit und Fortschritt",
+    text: "Gibt eurer BNE Arbeit Sichtbarkeit und ermöglicht messbare Evaluation, Reflexion und Steuerung des Fortschritts.",
+  },
 ];
 
 export const STATES = [
