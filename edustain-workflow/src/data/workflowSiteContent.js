@@ -121,3 +121,107 @@ export const MEMBER_PEOPLE = [
   { name: "Yusuf Demir", role: "Lehrer", school: "Gymnasium am Park" },
   { name: "Mila Hoffmann", role: "Schülervertretung", school: "Campus Süd" },
 ];
+
+export const QUICK_NAVIGATOR_STEPS = [
+  {
+    id: "goal",
+    label: "Was möchtest du gerade tun?",
+    description: "Wähle dein aktuelles Ziel.",
+    options: [
+      {
+        value: "project-start",
+        title: "Projekt starten",
+        description: "Neues Vorhaben planen.",
+      },
+      {
+        value: "inspiration",
+        title: "Inspiration finden",
+        description: "Ideen und Beispiele sehen.",
+      },
+      {
+        value: "partner",
+        title: "Partner finden",
+        description: "Kontakte und Angebote finden.",
+      },
+      {
+        value: "best-practices",
+        title: "Best Practices entdecken",
+        description: "Von anderen Schulen lernen.",
+      },
+      {
+        value: "offer",
+        title: "Angebot sichtbar machen",
+        description: "Eigenes Angebot platzieren.",
+      },
+    ],
+  },
+  {
+    id: "role",
+    label: "Wer bist du auf EDUSTAIN Connect?",
+    description: "Wähle deine Rolle.",
+    options: [
+      {
+        value: "student",
+        title: "Schüler",
+        description: "Lerne und gestalte mit.",
+      },
+      {
+        value: "teacher",
+        title: "Lehrkraft",
+        description: "Begleite Projekte und Unterricht.",
+      },
+      {
+        value: "project-lead",
+        title: "Projektleitung",
+        description: "Koordiniere Team und Umsetzung.",
+      },
+      {
+        value: "leadership",
+        title: "Schulleitung",
+        description: "Denke strategisch und langfristig.",
+      },
+      {
+        value: "partner",
+        title: "Externer Partner",
+        description: "Biete Angebote oder Expertise an.",
+      },
+    ],
+  },
+  {
+    id: "interest",
+    label: "Wofür interessierst du dich im Moment besonders?",
+    description: "Wähle dein Fokusthema.",
+    options: [
+      {
+        value: "biodiversity",
+        title: "Biodiversität",
+        description: "Schulgarten und Artenvielfalt.",
+      },
+      {
+        value: "energy",
+        title: "Energie",
+        description: "Energiesparen und Technik.",
+      },
+      {
+        value: "nutrition",
+        title: "Ernährung",
+        description: "Mensa, Konsum und Ernährung.",
+      },
+      {
+        value: "mobility",
+        title: "Mobilität",
+        description: "Schulwege und Bewegung.",
+      },
+      {
+        value: "school-development",
+        title: "Schulentwicklung",
+        description: "Strategie und Veränderung.",
+      },
+      {
+        value: "wsa",
+        title: "Whole School Approach",
+        description: "Ganzheitlicher Einstieg.",
+      },
+    ],
+  },
+];
