@@ -2,6 +2,11 @@ const MEMBER_KEY = "edustain-connect-demo-member";
 const WELCOME_KEY = "edustain-connect-demo-welcome";
 const QUICK_NAVIGATOR_SEEN_KEY = "edustain-connect-quick-nav-seen";
 const QUICK_NAVIGATOR_ANSWERS_KEY = "edustain-connect-quick-nav-answers";
+const AUTH_SESSION_KEY = "edustain-connect-demo-auth";
+
+function getStoredSessionAuth() {
+  return window.sessionStorage.getItem(AUTH_SESSION_KEY);
+}
 
 export function saveDemoMember(memberData) {
   const payload = {
@@ -13,6 +18,7 @@ export function saveDemoMember(memberData) {
   localStorage.setItem(WELCOME_KEY, "pending");
   localStorage.removeItem(QUICK_NAVIGATOR_SEEN_KEY);
   localStorage.removeItem(QUICK_NAVIGATOR_ANSWERS_KEY);
+  window.sessionStorage.setItem(AUTH_SESSION_KEY, payload.email);
 }
 
 export function getDemoMember() {
@@ -26,6 +32,44 @@ export function getDemoMember() {
   } catch {
     return null;
   }
+}
+
+export function isDemoMemberAuthenticated() {
+  const member = getDemoMember();
+  if (!member) {
+    return false;
+  }
+
+  return getStoredSessionAuth() === member.email;
+}
+
+export function loginDemoMember({ email, password }) {
+  const member = getDemoMember();
+
+  if (!member) {
+    return {
+      ok: false,
+      error: "Es gibt noch keinen Demo-Zugang. Bitte registriere dich zuerst.",
+    };
+  }
+
+  const normalizedEmail = email.trim().toLowerCase();
+  const storedEmail = member.email.trim().toLowerCase();
+
+  if (normalizedEmail !== storedEmail || password !== member.password) {
+    return {
+      ok: false,
+      error: "E-Mail oder Passwort stimmen nicht mit dem Demo-Zugang ueberein.",
+    };
+  }
+
+  window.sessionStorage.setItem(AUTH_SESSION_KEY, member.email);
+
+  return { ok: true };
+}
+
+export function logoutDemoMember() {
+  window.sessionStorage.removeItem(AUTH_SESSION_KEY);
 }
 
 export function consumeWelcomeBanner() {

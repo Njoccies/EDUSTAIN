@@ -1317,6 +1317,23 @@ select {
   text-align: center;
 }
 
+.member-access-card--login {
+  max-width: 1180px;
+  text-align: left;
+}
+
+.member-access-card__split {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
+  gap: 1.5rem;
+  align-items: stretch;
+}
+
+.member-access-card__content {
+  display: grid;
+  align-content: start;
+}
+
 .member-access-card__icon {
   width: 72px;
   height: 72px;
@@ -1333,12 +1350,69 @@ select {
   font-size: 2rem;
 }
 
+.member-access-card--login .member-access-card__icon {
+  margin: 0 0 1rem;
+}
+
 .member-access-card__actions {
   margin-top: 1.5rem;
   display: flex;
   justify-content: center;
   gap: 0.75rem;
   flex-wrap: wrap;
+}
+
+.member-access-card__actions--login {
+  justify-content: flex-start;
+}
+
+.member-access-card__actions--login-hero {
+  margin-top: 1.25rem;
+}
+
+.member-login-panel {
+  border-radius: 28px;
+  background: linear-gradient(180deg, #ffffff, #f8fbff);
+  border: 1px solid #dbe4ee;
+  padding: 1.4rem;
+  box-shadow: 0 22px 48px rgba(15, 23, 42, 0.06);
+  display: grid;
+  gap: 1rem;
+}
+
+.member-login-panel--compact {
+  margin: 1.5rem auto 0;
+  max-width: 560px;
+  text-align: left;
+}
+
+.member-login-panel__header {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.member-login-panel__header h2 {
+  font-family: "Montserrat", sans-serif;
+}
+
+.member-login-panel__header p:last-child,
+.member-login-panel__hint p {
+  margin-top: 0;
+  color: #4b5563;
+}
+
+.member-login-panel__hint {
+  border-radius: 18px;
+  background: rgba(237, 246, 238, 0.75);
+  border: 1px solid rgba(47, 143, 58, 0.12);
+  padding: 0.95rem 1rem;
+}
+
+.member-login-panel__hint strong {
+  display: block;
+  margin-bottom: 0.3rem;
+  color: #111827;
+  font-family: "Montserrat", sans-serif;
 }
 
 .personalized-start {
@@ -1787,6 +1861,7 @@ select {
   .platform-pathways__grid,
   .navigator-showcase__layout,
   .navigator-showcase__steps,
+  .member-access-card__split,
   .registration-cta-card,
   .registration-layout,
   .member-hero,
@@ -1846,12 +1921,18 @@ select {
 
   .pathway-card,
   .navigator-step-card,
-  .navigator-showcase__aside-card {
+  .navigator-showcase__aside-card,
+  .member-login-panel {
     padding: 1.1rem;
   }
 
+  .member-access-card__actions--login {
+    justify-content: stretch;
+  }
+
   .personalized-start__top,
-  .personalized-start__actions {
+  .personalized-start__actions,
+  .member-access-card__actions--login {
     flex-direction: column;
     align-items: stretch;
   }
