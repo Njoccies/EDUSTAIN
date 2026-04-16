@@ -6,21 +6,41 @@ import {
 } from "../data/workflowSiteContent.js";
 import { saveDemoMember } from "../lib/demoSession.js";
 
-const STEPS = [
+const DEFAULT_STEPS = [
+  { id: "start", label: "Zugang wählen" },
   { id: "personal", label: "Persönliche Daten" },
   { id: "school", label: "Schulische Informationen" },
   { id: "project", label: "Projektinformationen" },
   { id: "legal", label: "Rechtliches" },
 ];
 
-const STEP_FIELDS = [
+const WITHOUT_CODE_STEPS = DEFAULT_STEPS;
+
+const WITH_CODE_STEPS = [
+  { id: "start", label: "Zugang wählen" },
+  { id: "personal", label: "Persönliche Daten" },
+  { id: "legal", label: "Rechtliches" },
+];
+
+const DEFAULT_STEP_FIELDS = [
+  ["registrationMode"],
   ["firstName", "lastName", "email", "password"],
   ["schoolName", "schoolRole", "state"],
   ["projectGroup"],
   ["consent"],
 ];
 
+const WITHOUT_CODE_STEP_FIELDS = DEFAULT_STEP_FIELDS;
+
+const WITH_CODE_STEP_FIELDS = [
+  ["registrationMode", "accessCode"],
+  ["firstName", "lastName", "email", "password"],
+  ["consent"],
+];
+
 const INITIAL_FORM = {
+  registrationMode: "",
+  accessCode: "",
   firstName: "",
   lastName: "",
   email: "",
@@ -40,8 +60,30 @@ function isValidEmail(value) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
+function getModeLabel(mode) {
+  if (mode === "with-code") {
+    return "Mit Zugangscode";
+  }
+  if (mode === "without-code") {
+    return "Ohne Zugangscode";
+  }
+  return "Noch nicht gewählt";
+}
+
 function validateField(name, formData) {
   const value = formData[name];
+  const requiresSchoolDetails = formData.registrationMode !== "with-code";
+
+  if (name === "registrationMode" && value.trim().length === 0) {
+    return "Bitte wähle aus, ob du mit oder ohne Code starten möchtest.";
+  }
+  if (
+    name === "accessCode" &&
+    formData.registrationMode === "with-code" &&
+    value.trim().length === 0
+  ) {
+    return "Bitte gib den Zugangscode ein.";
+  }
 
   if (name === "firstName" && value.trim().length === 0) {
     return "Bitte gib deinen Vornamen ein.";
@@ -65,16 +107,16 @@ function validateField(name, formData) {
       return "Das Passwort muss mindestens 8 Zeichen lang sein.";
     }
   }
-  if (name === "schoolName" && value.trim().length === 0) {
+  if (name === "schoolName" && requiresSchoolDetails && value.trim().length === 0) {
     return "Bitte gib den Namen der Schule ein.";
   }
-  if (name === "schoolRole" && value.trim().length === 0) {
+  if (name === "schoolRole" && requiresSchoolDetails && value.trim().length === 0) {
     return "Bitte wähle deine Position innerhalb der Schule.";
   }
-  if (name === "state" && value.trim().length === 0) {
+  if (name === "state" && requiresSchoolDetails && value.trim().length === 0) {
     return "Bitte wähle ein Bundesland.";
   }
-  if (name === "projectGroup" && value.trim().length === 0) {
+  if (name === "projectGroup" && requiresSchoolDetails && value.trim().length === 0) {
     return "Bitte wähle eine Projektgruppe.";
   }
   if (name === "consent" && value !== true) {
@@ -94,10 +136,10 @@ function collectErrors(formData) {
   }, {});
 }
 
-function Stepper({ currentStep }) {
+function Stepper({ currentStep, steps }) {
   return (
     <ol className="registration-stepper" aria-label="Registrierungsschritte">
-      {STEPS.map((step, index) => {
+      {steps.map((step, index) => {
         const state =
           index < currentStep ? "done" : index === currentStep ? "active" : "upcoming";
         return (
@@ -122,9 +164,33 @@ export default function RegistrationPage({ onNavigateHome, onNavigateMembers }) 
   const [touched, setTouched] = useState({});
   const [submitState, setSubmitState] = useState("idle");
 
+  const steps = useMemo(() => {
+    if (formData.registrationMode === "with-code") {
+      return WITH_CODE_STEPS;
+    }
+    if (formData.registrationMode === "without-code") {
+      return WITHOUT_CODE_STEPS;
+    }
+    return DEFAULT_STEPS;
+  }, [formData.registrationMode]);
+
+  const stepFields = useMemo(() => {
+    if (formData.registrationMode === "with-code") {
+      return WITH_CODE_STEP_FIELDS;
+    }
+    if (formData.registrationMode === "without-code") {
+      return WITHOUT_CODE_STEP_FIELDS;
+    }
+    return DEFAULT_STEP_FIELDS;
+  }, [formData.registrationMode]);
+
   const errors = useMemo(() => collectErrors(formData), [formData]);
-  const currentFields = STEP_FIELDS[currentStep];
+  const currentFields = stepFields[currentStep] ?? [];
   const isCurrentStepValid = currentFields.every((field) => !errors[field]);
+
+  useEffect(() => {
+    setCurrentStep((current) => Math.min(current, steps.length - 1));
+  }, [steps.length]);
 
   useEffect(() => {
     if (submitState !== "success") {
@@ -152,6 +218,9 @@ export default function RegistrationPage({ onNavigateHome, onNavigateMembers }) 
     const { name, value, type, checked } = event.target;
     setFormData((current) => ({
       ...current,
+      ...(name === "registrationMode" && value === "without-code"
+        ? { accessCode: "" }
+        : null),
       [name]: type === "checkbox" ? checked : value,
     }));
   };
@@ -169,7 +238,7 @@ export default function RegistrationPage({ onNavigateHome, onNavigateMembers }) 
     if (!isCurrentStepValid) {
       return;
     }
-    setCurrentStep((current) => Math.min(current + 1, STEPS.length - 1));
+    setCurrentStep((current) => Math.min(current + 1, steps.length - 1));
   };
 
   const handleBack = () => {
@@ -187,7 +256,7 @@ export default function RegistrationPage({ onNavigateHome, onNavigateMembers }) 
 
     const allErrors = collectErrors(formData);
     if (Object.keys(allErrors).length > 0) {
-      setCurrentStep(STEP_FIELDS.findIndex((fields) => fields.some((field) => allErrors[field])));
+      setCurrentStep(stepFields.findIndex((fields) => fields.some((field) => allErrors[field])));
       return;
     }
 
@@ -209,20 +278,22 @@ export default function RegistrationPage({ onNavigateHome, onNavigateMembers }) 
           <p className="registration-hero__eyebrow">EDUSTAIN-Connect Registrierung</p>
           <h1>Werde Teil der EDUSTAIN-Connect Community</h1>
           <p>
-            Dieser Flow ist ein klickbarer Frontend-Prototyp. Es wird kein echtes Konto angelegt
-            und keine E-Mail wirklich versendet.
+            Dieser Flow ist ein klickbarer Frontend-Prototyp. Du kannst mit oder ohne
+            Zugangscode starten. Es wird kein echtes Konto angelegt und keine E-Mail wirklich
+            versendet.
           </p>
         </div>
       </section>
 
       <div className="registration-layout">
         <aside className="registration-sidebar">
-          <Stepper currentStep={currentStep} />
+          <Stepper currentStep={currentStep} steps={steps} />
           <div className="registration-sidebar__hint">
             <strong>Demo-Hinweis</strong>
             <p>
               Alle Eingaben bleiben nur im Frontend erhalten und werden ausschließlich für diesen
-              prototypischen Ablauf simuliert.
+              prototypischen Ablauf simuliert. Mit Code verkürzt sich der Flow auf die nötigen
+              Kerndaten.
             </p>
           </div>
         </aside>
@@ -249,19 +320,104 @@ export default function RegistrationPage({ onNavigateHome, onNavigateMembers }) 
               <div className="registration-form__header">
                 <div>
                   <p className="registration-form__step-label">
-                    Schritt {currentStep + 1} von {STEPS.length}
+                    Schritt {currentStep + 1} von {steps.length}
                   </p>
-                  <h2>{STEPS[currentStep].label}</h2>
+                  <h2>{steps[currentStep].label}</h2>
                 </div>
                 <div className="registration-progress">
                   <div
                     className="registration-progress__bar"
-                    style={{ width: `${((currentStep + 1) / STEPS.length) * 100}%` }}
+                    style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
                   />
                 </div>
               </div>
 
               {currentStep === 0 && (
+                <div className="registration-fields">
+                  <div className="mode-intro-card">
+                    <h3>Wie möchtest du mit der Registrierung starten?</h3>
+                    <p>
+                      Ohne Code durchläufst du den vollständigen Demo-Flow. Mit Code startest du
+                      in einer verkürzten Variante und bestätigst danach nur noch deine
+                      persönlichen Daten und die rechtlichen Hinweise.
+                    </p>
+                  </div>
+
+                  <fieldset className="mode-choice-group">
+                    <legend>Registrierungsweg auswählen</legend>
+                    <div className="mode-choice-grid">
+                      <label
+                        className={`mode-choice-card ${
+                          formData.registrationMode === "without-code" ? "is-selected" : ""
+                        }`}
+                      >
+                        <input
+                          checked={formData.registrationMode === "without-code"}
+                          name="registrationMode"
+                          onBlur={handleFieldBlur}
+                          onChange={handleFieldChange}
+                          type="radio"
+                          value="without-code"
+                        />
+                        <span className="mode-choice-card__content">
+                          <span className="mode-choice-card__eyebrow">Ohne Code</span>
+                          <strong>Zum vollständigen Registrierungsformular</strong>
+                          <span>
+                            Du gehst durch persönliche Daten, schulische Informationen,
+                            Projektgruppe und Rechtliches.
+                          </span>
+                        </span>
+                      </label>
+
+                      <label
+                        className={`mode-choice-card ${
+                          formData.registrationMode === "with-code" ? "is-selected" : ""
+                        }`}
+                      >
+                        <input
+                          checked={formData.registrationMode === "with-code"}
+                          name="registrationMode"
+                          onBlur={handleFieldBlur}
+                          onChange={handleFieldChange}
+                          type="radio"
+                          value="with-code"
+                        />
+                        <span className="mode-choice-card__content">
+                          <span className="mode-choice-card__eyebrow">Mit Code</span>
+                          <strong>Verkürzter Einstieg mit Admin-Code</strong>
+                          <span>
+                            Du gibst deinen Code direkt hier ein und springst danach in den
+                            kompakten Demo-Flow mit Persönlichen Daten und Rechtlichem.
+                          </span>
+                        </span>
+                      </label>
+                    </div>
+                    {renderError("registrationMode")}
+                  </fieldset>
+
+                  {formData.registrationMode === "with-code" && (
+                    <div className="access-code-panel">
+                      <div className="field-block">
+                        <label htmlFor="accessCode">Zugangscode</label>
+                        <input
+                          id="accessCode"
+                          name="accessCode"
+                          value={formData.accessCode}
+                          onChange={handleFieldChange}
+                          onBlur={handleFieldBlur}
+                          placeholder="Code eingeben"
+                        />
+                        <p className="field-help">
+                          Jeder nicht-leere Code funktioniert in diesem Clickdummy.
+                        </p>
+                        {renderError("accessCode")}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {currentStep === 1 && (
                 <div className="registration-fields">
                   <div className="field-row field-row--double">
                     <div className="field-block">
@@ -320,7 +476,7 @@ export default function RegistrationPage({ onNavigateHome, onNavigateMembers }) 
                 </div>
               )}
 
-              {currentStep === 1 && (
+              {steps[currentStep].id === "school" && (
                 <div className="registration-fields">
                   <div className="field-block">
                     <label htmlFor="schoolName">Name der Schule</label>
@@ -383,7 +539,7 @@ export default function RegistrationPage({ onNavigateHome, onNavigateMembers }) 
                 </div>
               )}
 
-              {currentStep === 2 && (
+              {steps[currentStep].id === "project" && (
                 <div className="registration-fields">
                   <div className="field-block">
                     <label htmlFor="projectGroup">Projektgruppe</label>
@@ -412,7 +568,7 @@ export default function RegistrationPage({ onNavigateHome, onNavigateMembers }) 
                 </div>
               )}
 
-              {currentStep === 3 && (
+              {steps[currentStep].id === "legal" && (
                 <div className="registration-fields">
                   <div className="legal-card">
                     <h3>Rechtliches und Abschluss</h3>
@@ -442,20 +598,32 @@ export default function RegistrationPage({ onNavigateHome, onNavigateMembers }) 
                   <div className="summary-card">
                     <h3>Zusammenfassung</h3>
                     <div className="summary-grid">
+                      <span>Registrierungsweg</span>
+                      <strong>{getModeLabel(formData.registrationMode)}</strong>
+                      {formData.registrationMode === "with-code" && (
+                        <>
+                          <span>Zugangscode</span>
+                          <strong>{formData.accessCode}</strong>
+                        </>
+                      )}
                       <span>Name</span>
                       <strong>
                         {formData.firstName} {formData.lastName}
                       </strong>
                       <span>E-Mail</span>
                       <strong>{formData.email}</strong>
-                      <span>Schule</span>
-                      <strong>{formData.schoolName}</strong>
-                      <span>Position</span>
-                      <strong>{formData.schoolRole}</strong>
-                      <span>Bundesland</span>
-                      <strong>{formData.state}</strong>
-                      <span>Projektgruppe</span>
-                      <strong>{formData.projectGroup}</strong>
+                      {formData.registrationMode !== "with-code" && (
+                        <>
+                          <span>Schule</span>
+                          <strong>{formData.schoolName}</strong>
+                          <span>Position</span>
+                          <strong>{formData.schoolRole}</strong>
+                          <span>Bundesland</span>
+                          <strong>{formData.state}</strong>
+                          <span>Projektgruppe</span>
+                          <strong>{formData.projectGroup}</strong>
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -475,7 +643,7 @@ export default function RegistrationPage({ onNavigateHome, onNavigateMembers }) 
                     </button>
                   )}
 
-                  {currentStep < STEPS.length - 1 ? (
+                  {currentStep < steps.length - 1 ? (
                     <button
                       className="button button--primary"
                       onClick={handleNext}
