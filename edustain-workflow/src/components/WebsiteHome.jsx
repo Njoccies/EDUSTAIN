@@ -61,7 +61,20 @@ export default function WebsiteHome({
       <main className="site-main">
         <section className="welcome-section" ref={welcomeRef} id="welcome">
           <div className="welcome-section__intro">
-            <h2>Die Plattform für nachhaltige Schulentwicklung <span className="welcome-section__accent">(Whole School Approach)</span></h2>
+            <h2>
+              <span>Die Plattform für nachhaltige Schulentwicklung</span>
+              <span className="welcome-section__accent">
+                <span className="welcome-section__accent-word welcome-section__accent-word--w">
+                  Whole
+                </span>{" "}
+                <span className="welcome-section__accent-word welcome-section__accent-word--s">
+                  School
+                </span>{" "}
+                <span className="welcome-section__accent-word welcome-section__accent-word--a">
+                  Approach
+                </span>
+              </span>
+            </h2>
             <p>
               Vernetzt euch mit anderen Schulen, findet Inspiration und setzt Bildung für
               nachhaltige Entwicklung (BNE) Schritt für Schritt an eurer Schule um.

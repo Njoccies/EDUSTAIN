@@ -1,5 +1,7 @@
 import { useMemo, useState } from "react";
-import { STATES } from "./data/workflowSiteContent.js";
+import ProjectsViewSwitcher from "./components/ProjectsViewSwitcher.jsx";
+import { PARTNER_DIRECTORY, STATES } from "./data/workflowSiteContent.js";
+import { awardMemberProgress } from "./lib/memberLevel.js";
 
 const STEPS = [
   { id: "basis", label: "Basisangaben" },
@@ -278,15 +280,23 @@ function Stepper({ currentStep }) {
   );
 }
 
-export default function ProjectsPlannerTab() {
+export default function ProjectsPlannerTab({ currentView, onChangeView }) {
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState(INITIAL_FORM);
   const [touched, setTouched] = useState({});
   const [submitState, setSubmitState] = useState("idle");
+  const [selectedDirectoryPartner, setSelectedDirectoryPartner] = useState("");
 
   const errors = useMemo(() => collectErrors(formData), [formData]);
   const currentFields = STEP_FIELDS[currentStep];
   const isCurrentStepValid = currentFields.every((field) => !errors[field]);
+  const directoryPartners = useMemo(
+    () =>
+      [...PARTNER_DIRECTORY].sort((a, b) =>
+        a.name.localeCompare(b.name, "de", { sensitivity: "base" }),
+      ),
+    [],
+  );
 
   const markStepAsTouched = () => {
     setTouched((current) => {
@@ -344,6 +354,32 @@ export default function ProjectsPlannerTab() {
     setTouched({});
     setCurrentStep(0);
     setSubmitState("idle");
+    setSelectedDirectoryPartner("");
+  };
+
+  const handleDirectoryPartnerAdd = () => {
+    if (!selectedDirectoryPartner) {
+      return;
+    }
+
+    setFormData((current) => {
+      const existingPartners = current.executionPartners
+        .split(",")
+        .map((entry) => entry.trim())
+        .filter(Boolean);
+
+      if (existingPartners.includes(selectedDirectoryPartner)) {
+        return current;
+      }
+
+      return {
+        ...current,
+        executionPartners: [...existingPartners, selectedDirectoryPartner].join(", "),
+      };
+    });
+
+    setTouched((current) => ({ ...current, executionPartners: true }));
+    setSelectedDirectoryPartner("");
   };
 
   const handleSubmit = (event) => {
@@ -366,6 +402,7 @@ export default function ProjectsPlannerTab() {
       return;
     }
 
+    awardMemberProgress("projectPlanner");
     setSubmitState("success");
     if (typeof window !== "undefined") {
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -380,7 +417,9 @@ export default function ProjectsPlannerTab() {
   };
 
   return (
-    <div className="page-shell page-shell--registration">
+    <div className="page-shell page-shell--registration page-shell--projects">
+      <ProjectsViewSwitcher currentView={currentView} onChangeView={onChangeView} />
+
       <section className="registration-hero">
         <div className="registration-hero__copy">
           <p className="registration-hero__eyebrow">
@@ -527,6 +566,14 @@ export default function ProjectsPlannerTab() {
               </div>
 
               <div className="registration-actions__cluster">
+                <button
+                  className="button button--primary"
+                  onClick={() => onChangeView("catalog")}
+                  type="button"
+                >
+                  <Icon name="view_list" />
+                  <span>Zum Projektkatalog</span>
+                </button>
                 <button
                   className="button button--ghost"
                   onClick={handleReset}
@@ -994,6 +1041,43 @@ export default function ProjectsPlannerTab() {
                       onBlur={handleFieldBlur}
                       placeholder="z. B. NABU Ortsgruppe, GartenWerkStadt e.V., Grundschule Süd"
                     />
+                    <div className="field-block field-block--embedded">
+                      <label htmlFor="directoryPartner">
+                        Partner aus dem Verzeichnis auswaehlen
+                      </label>
+                      <p className="field-help">
+                        Optional kannst du einen bereits auf der Partnerseite gelisteten Partner
+                        direkt uebernehmen.
+                      </p>
+                      <div className="field-row field-row--double">
+                        <div className="select-wrap">
+                          <select
+                            id="directoryPartner"
+                            value={selectedDirectoryPartner}
+                            onChange={(event) =>
+                              setSelectedDirectoryPartner(event.target.value)
+                            }
+                          >
+                            <option value="">Partner auswaehlen …</option>
+                            {directoryPartners.map((partner) => (
+                              <option key={partner.id} value={partner.name}>
+                                {partner.name} · {partner.region}
+                              </option>
+                            ))}
+                          </select>
+                          <Icon name="chevron_right" />
+                        </div>
+                        <button
+                          type="button"
+                          className="button button--ghost"
+                          onClick={handleDirectoryPartnerAdd}
+                          disabled={!selectedDirectoryPartner}
+                        >
+                          <Icon name="add" />
+                          <span>Partner hinzufuegen</span>
+                        </button>
+                      </div>
+                    </div>
                   </div>
 
                   <div className="field-block">

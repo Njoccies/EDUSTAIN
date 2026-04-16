@@ -305,6 +305,160 @@ export const PARTNER_DIRECTORY = [
   },
 ];
 
+export const PROJECT_CATALOG_CATEGORIES = [
+  {
+    id: "school-development",
+    label: "Schulentwicklung",
+    icon: "track_changes",
+    accent: "education",
+  },
+  {
+    id: "climate-energy",
+    label: "Klima & Energie",
+    icon: "bolt",
+    accent: "climate",
+  },
+  {
+    id: "nutrition",
+    label: "Ernährung",
+    icon: "restaurant",
+    accent: "food",
+  },
+  {
+    id: "biodiversity",
+    label: "Biodiversität",
+    icon: "park",
+    accent: "nature",
+  },
+  {
+    id: "mobility",
+    label: "Mobilität",
+    icon: "directions_bike",
+    accent: "mobility",
+  },
+  {
+    id: "participation",
+    label: "Partizipation",
+    icon: "groups",
+    accent: "culture",
+  },
+];
+
+export const PROJECT_CATALOG_ITEMS = [
+  {
+    id: "leitbild-campus-nord",
+    title: "Nachhaltigkeitsleitbild für die Schule",
+    school: "Campus Nord Gesamtschule",
+    state: "Nordrhein-Westfalen",
+    category: "school-development",
+    phase: "In Entwicklung",
+    timeframe: "6 Monate",
+    description:
+      "Kollegium, Schüler*innen und Schulleitung entwickeln gemeinsam ein Leitbild mit klaren Prioritäten für den Whole School Approach.",
+    impact:
+      "Ergebnis ist ein abgestimmtes Zielbild inklusive erster Maßnahmen und Verantwortlichkeiten.",
+    tags: ["Strategie", "Moderation", "Leitbild", "WSA"],
+  },
+  {
+    id: "wsa-roadmap-90",
+    title: "WSA-Roadmap in 90 Tagen",
+    school: "Gemeinschaftsschule Elbtal",
+    state: "Niedersachsen",
+    category: "school-development",
+    phase: "Aktiv",
+    timeframe: "90 Tage",
+    description:
+      "Eine kleine Steuergruppe priorisiert die ersten Schritte, sammelt bestehende Initiativen und plant eine sichtbare Startphase.",
+    impact:
+      "Das Projekt schafft Klarheit über Zuständigkeiten und macht Fortschritt im Schulalltag schnell sichtbar.",
+    tags: ["Roadmap", "Steuergruppe", "Priorisierung", "Praxisstart"],
+  },
+  {
+    id: "energie-detektive",
+    title: "Energie-Detektive im Schulgebäude",
+    school: "Gymnasium am Park",
+    state: "Hessen",
+    category: "climate-energy",
+    phase: "Aktiv",
+    timeframe: "1 Schulhalbjahr",
+    description:
+      "Schüler*innen prüfen gemeinsam mit Hausmeisterteam und Lehrkräften Energieverbrauch, Beleuchtung und Raumtemperaturen.",
+    impact:
+      "Die Schule erhält eine einfache Maßnahmenliste für Einsparungen und Unterrichtsanlässe rund um Energie.",
+    tags: ["Energiecheck", "Schülerforschung", "Gebäude", "Klimaschutz"],
+  },
+  {
+    id: "mensa-fair-regional",
+    title: "Mensa regional und fair weiterdenken",
+    school: "Realschule Südstadt",
+    state: "Baden-Württemberg",
+    category: "nutrition",
+    phase: "Pilotphase",
+    timeframe: "4 Monate",
+    description:
+      "Mensa-Team, Eltern und Projektgruppe testen gemeinsam neue regionale Produkte, Feedbackformate und Kommunikationsideen.",
+    impact:
+      "Erste Menülinien werden nachhaltiger, gleichzeitig steigt die Beteiligung der Schulgemeinschaft.",
+    tags: ["Mensa", "Regionale Beschaffung", "Eltern", "Pilot"],
+  },
+  {
+    id: "schulgarten-lernort",
+    title: "Schulgarten als Lernort ausbauen",
+    school: "Oberschule Sonnenhang",
+    state: "Sachsen",
+    category: "biodiversity",
+    phase: "In Umsetzung",
+    timeframe: "Ganzjährig",
+    description:
+      "Freiflächen werden mit AG, Biologieunterricht und externen Partnern zu einem Lernort für Artenvielfalt und Ernährung entwickelt.",
+    impact:
+      "Der Garten wird dauerhaft in Unterricht, Pausenangebote und Aktionstage integriert.",
+    tags: ["Schulgarten", "Artenvielfalt", "Unterricht", "Lernort"],
+  },
+  {
+    id: "fahrradbus-schulweg",
+    title: "Fahrradbus und sichere Schulwege",
+    school: "Stadtteilschule Hafenblick",
+    state: "Hamburg",
+    category: "mobility",
+    phase: "Vorbereitung",
+    timeframe: "8 Wochen",
+    description:
+      "Die Schule organisiert gemeinsam mit Familien und Kommune einen begleiteten Fahrradbus und bewertet Gefahrenstellen rund um den Schulweg.",
+    impact:
+      "Mehr Sichtbarkeit für sichere Mobilität und konkrete Verbesserungen im Umfeld der Schule.",
+    tags: ["Fahrradbus", "Kommune", "Sichere Schulwege", "Bewegung"],
+  },
+  {
+    id: "ideenlabor-zukunft",
+    title: "Ideenlabor Zukunftstage",
+    school: "Schulzentrum Uferblick",
+    state: "Rheinland-Pfalz",
+    category: "participation",
+    phase: "Abgeschlossen",
+    timeframe: "3 Projekttage",
+    description:
+      "In moderierten Zukunftstagen entwickeln Klassen, Lehrkräfte und Partner gemeinsam kleine, realistische Projektideen für das kommende Schuljahr.",
+    impact:
+      "Aus den Workshops entstehen mehrere umsetzbare Vorhaben mit hoher Identifikation in der Schulgemeinschaft.",
+    tags: ["Ideenlabor", "Beteiligung", "Moderation", "Projekttage"],
+  },
+  {
+    id: "repair-lab",
+    title: "Repair-Lab für Schule und Stadtteil",
+    school: "Gesamtschule Westend",
+    state: "Berlin",
+    category: "participation",
+    phase: "Aktiv",
+    timeframe: "laufend",
+    description:
+      "Ein schulisches Repair-Lab verbindet Technikunterricht, Nachmittagsangebote und lokale Ehrenamtliche rund um Reparatur und Ressourcenschonung.",
+    impact:
+      "Der Lernort stärkt Praxisbezug, Kooperationen und die Sichtbarkeit nachhaltigen Handelns.",
+    tags: ["Repair", "Technik", "Kooperation", "Ressourcen"],
+  },
+];
+
 export const QUICK_NAVIGATOR_STEPS = [
   {
     id: "goal",

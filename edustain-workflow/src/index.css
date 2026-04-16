@@ -327,6 +327,8 @@ select {
 }
 
 .welcome-section__intro h2 {
+  display: grid;
+  gap: 0.2rem;
   margin-bottom: 1rem;
   font-family: "Montserrat", sans-serif;
   font-size: clamp(2rem, 4vw, 3rem);
@@ -339,8 +341,20 @@ select {
 }
 
 .welcome-section__accent {
-  color: #0077b6;
+  display: block;
   font-weight: 700;
+}
+
+.welcome-section__accent-word--w {
+  color: #2f8f3a;
+}
+
+.welcome-section__accent-word--s {
+  color: #0077b6;
+}
+
+.welcome-section__accent-word--a {
+  color: #e58e26;
 }
 
 .benefit-grid {
@@ -1170,6 +1184,18 @@ select {
   gap: 0.45rem;
 }
 
+.field-block--embedded {
+  margin-top: 0.85rem;
+  padding: 0.95rem;
+  border-radius: 18px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+
+.field-block--embedded .field-row {
+  align-items: end;
+}
+
 .field-block label,
 .legal-card h3,
 .summary-card h3 {
@@ -1329,6 +1355,119 @@ select {
 
 .member-profile-card p + p {
   margin-top: 0.3rem;
+}
+
+.member-level {
+  margin-top: 1.2rem;
+  padding: 1rem;
+  border-radius: 22px;
+  border: 1px solid #dbe4ee;
+  background: linear-gradient(180deg, #ffffff, #f8fbff);
+}
+
+.member-level--bronze {
+  background: linear-gradient(180deg, #fff8f3, #ffffff);
+}
+
+.member-level--silber {
+  background: linear-gradient(180deg, #f8fafc, #ffffff);
+}
+
+.member-level--gold {
+  background: linear-gradient(180deg, #fffbea, #ffffff);
+}
+
+.member-level--platin {
+  background: linear-gradient(180deg, #f5fbff, #ffffff);
+}
+
+.member-level--master {
+  background: linear-gradient(180deg, #f4fbf6, #ffffff);
+}
+
+.member-level__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.member-level__header-main {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.member-level__icon {
+  width: 2.8rem;
+  height: 2.8rem;
+  border-radius: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: #ffffff;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+  color: #111827;
+}
+
+.member-level__eyebrow {
+  color: #6b7280;
+  font-size: 0.82rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.member-level__header strong {
+  display: block;
+  margin-top: 0.15rem;
+  font-family: "Montserrat", sans-serif;
+  font-size: 1.1rem;
+  color: #111827;
+}
+
+.member-level__header > span {
+  color: #374151;
+  font-weight: 800;
+}
+
+.member-level__bar {
+  margin-top: 0.85rem;
+  height: 10px;
+  border-radius: 999px;
+  background: #e5e7eb;
+  overflow: hidden;
+}
+
+.member-level__bar-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(135deg, #2f8f3a, #0077b6);
+}
+
+.member-level__next {
+  margin-top: 0.7rem;
+  color: #4b5563;
+  font-size: 0.94rem;
+}
+
+.member-level__highlights {
+  margin-top: 0.85rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.member-level__highlights span {
+  display: inline-flex;
+  padding: 0.42rem 0.75rem;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 1px solid #dbe4ee;
+  color: #111827;
+  font-size: 0.88rem;
+  font-weight: 700;
 }
 
 .member-grid {
@@ -2715,6 +2854,721 @@ select {
   max-width: 640px;
 }
 
+/* ============ Projects switcher + catalog ============ */
+.page-shell--projects {
+  background:
+    radial-gradient(circle at top left, rgba(47, 143, 58, 0.08), transparent 28%),
+    radial-gradient(circle at top right, rgba(0, 119, 182, 0.08), transparent 26%),
+    #f8fafc;
+}
+
+.projects-switcher,
+.project-catalog-hero,
+.project-catalog-search,
+.project-catalog-results,
+.project-catalog-cta {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding-inline: 1.5rem;
+}
+
+.projects-switcher {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 0.5rem;
+  padding-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.projects-switcher__copy {
+  display: grid;
+  gap: 0.18rem;
+}
+
+.projects-switcher__eyebrow {
+  margin: 0;
+  color: #2f8f3a;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.projects-switcher__copy strong {
+  color: #1D2233;
+  font-family: "Montserrat", sans-serif;
+  font-size: 1.15rem;
+}
+
+.projects-switcher__copy span {
+  color: #6b7280;
+  font-size: 0.92rem;
+}
+
+.projects-switcher__control {
+  display: grid;
+  gap: 0.4rem;
+  min-width: min(100%, 290px);
+}
+
+.projects-switcher__control > span {
+  color: #4b5563;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.projects-switcher__select-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 52px;
+  border-radius: 16px;
+  border: 1px solid #dbe4ee;
+  background: #ffffff;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.05);
+}
+
+.projects-switcher__select-wrap:focus-within {
+  border-color: #0077b6;
+  box-shadow: 0 0 0 3px rgba(0, 119, 182, 0.12);
+}
+
+.projects-switcher__select-wrap .workflow-icon {
+  position: absolute;
+  right: 1rem;
+  color: #0077b6;
+  pointer-events: none;
+}
+
+.projects-switcher__select-wrap select {
+  width: 100%;
+  padding: 0.95rem 3rem 0.95rem 1rem;
+  border: 0;
+  border-radius: 16px;
+  background: transparent;
+  color: #111827;
+  font: inherit;
+  font-weight: 600;
+  appearance: none;
+  outline: none;
+  cursor: pointer;
+}
+
+.project-catalog-hero {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.project-catalog-hero__copy {
+  max-width: 760px;
+}
+
+.project-catalog-hero__eyebrow {
+  display: inline-flex;
+  margin-bottom: 0.85rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: 999px;
+  background: rgba(47, 143, 58, 0.12);
+  color: #2f8f3a;
+  font-weight: 800;
+}
+
+.project-catalog-hero h1 {
+  margin: 0;
+  font-family: "Montserrat", sans-serif;
+  font-size: clamp(2rem, 4.2vw, 3.1rem);
+  line-height: 1.08;
+  color: #1D2233;
+}
+
+.project-catalog-hero__copy p {
+  margin-top: 1rem;
+  color: #4b5563;
+  font-size: 1.02rem;
+}
+
+.project-catalog-hero__meta {
+  display: flex;
+  gap: 1.25rem;
+  margin-top: 1.25rem;
+  flex-wrap: wrap;
+  color: #4b5563;
+  font-size: 0.92rem;
+}
+
+.project-catalog-hero__meta strong {
+  color: #1D2233;
+  font-size: 1.1rem;
+  margin-right: 0.3rem;
+}
+
+.project-catalog-hero__actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.project-catalog-search {
+  display: grid;
+  gap: 1rem;
+  padding-bottom: 1.5rem;
+}
+
+.project-catalog-search__field {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.9rem 1.1rem;
+  background: #ffffff;
+  border: 1px solid #dbe4ee;
+  border-radius: 16px;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.04);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.project-catalog-search__field:focus-within {
+  border-color: #0077b6;
+  box-shadow: 0 0 0 3px rgba(0, 119, 182, 0.12);
+}
+
+.project-catalog-search__field .workflow-icon {
+  color: #0077b6;
+}
+
+.project-catalog-search__field input {
+  flex: 1;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 1rem;
+  color: #111827;
+}
+
+.project-catalog-search__clear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 0;
+  background: #f1f5f9;
+  color: #4b5563;
+  cursor: pointer;
+}
+
+.project-catalog-search__clear:hover {
+  background: #e2e8f0;
+}
+
+.project-catalog-search__filters-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.6rem;
+}
+
+.project-catalog-search__filters-head p {
+  margin: 0;
+  font-weight: 700;
+  color: #1D2233;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 0.82rem;
+}
+
+.project-catalog-search__reset {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid #dbe4ee;
+  background: #ffffff;
+  color: #4b5563;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.project-catalog-search__reset:hover {
+  color: #0077b6;
+  border-color: #0077b6;
+}
+
+.project-catalog-search__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.project-catalog-results {
+  padding-bottom: 2rem;
+}
+
+.project-catalog-results__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.project-catalog-results__header h2 {
+  margin: 0;
+  font-family: "Montserrat", sans-serif;
+  font-size: 1.4rem;
+  color: #1D2233;
+}
+
+.project-catalog-results__header p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.92rem;
+}
+
+.project-catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.project-catalog-empty {
+  display: grid;
+  justify-items: center;
+  gap: 0.5rem;
+  padding: 3rem 1.5rem;
+  background: #ffffff;
+  border: 1px dashed #dbe4ee;
+  border-radius: 18px;
+  text-align: center;
+}
+
+.project-catalog-empty .workflow-icon {
+  font-size: 42px;
+  color: #94a3b8;
+}
+
+.project-catalog-empty h3 {
+  margin: 0;
+  font-family: "Montserrat", sans-serif;
+  color: #1D2233;
+}
+
+.project-catalog-empty p {
+  margin: 0;
+  color: #6b7280;
+}
+
+.project-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding: 1.15rem;
+  background: #ffffff;
+  border: 1px solid #dbe4ee;
+  border-radius: 20px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.project-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+  border-color: #0077b6;
+}
+
+.project-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.project-card__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.32rem 0.68rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.project-card__badge .material-icons {
+  font-size: 16px;
+}
+
+.project-card__badge--nature { background: rgba(47, 143, 58, 0.14); color: #1f6b28; }
+.project-card__badge--climate { background: rgba(229, 142, 38, 0.14); color: #a35f10; }
+.project-card__badge--food { background: rgba(163, 87, 44, 0.14); color: #7a3e1d; }
+.project-card__badge--mobility { background: rgba(0, 119, 182, 0.14); color: #045a8a; }
+.project-card__badge--culture { background: rgba(147, 51, 234, 0.14); color: #6b21a8; }
+.project-card__badge--education { background: rgba(37, 99, 235, 0.14); color: #1e40af; }
+
+.project-card__phase {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.32rem 0.72rem;
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.project-card h3 {
+  margin: 0;
+  font-family: "Montserrat", sans-serif;
+  font-size: 1.15rem;
+  line-height: 1.25;
+  color: #1D2233;
+}
+
+.project-card__school {
+  margin: 0;
+  color: #475569;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.project-card__desc {
+  margin: 0;
+  color: #4b5563;
+  line-height: 1.55;
+}
+
+.project-card__insight {
+  display: grid;
+  grid-template-columns: 20px 1fr;
+  gap: 0.65rem;
+  align-items: start;
+  padding: 0.85rem 0.9rem;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(47, 143, 58, 0.08), rgba(0, 119, 182, 0.08));
+}
+
+.project-card__insight .material-icons {
+  font-size: 18px;
+  color: #2f8f3a;
+  margin-top: 0.1rem;
+}
+
+.project-card__insight p {
+  margin: 0;
+  color: #334155;
+  font-size: 0.93rem;
+  line-height: 1.5;
+}
+
+.project-card__footer {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+}
+
+.project-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.project-card__tags span {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #475569;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.project-card__timeframe {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: #475569;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.project-card__timeframe .workflow-icon {
+  font-size: 18px;
+  color: #0077b6;
+}
+
+.project-catalog-cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  padding: 1.75rem;
+  background: linear-gradient(135deg, rgba(47, 143, 58, 0.1), rgba(0, 119, 182, 0.1));
+  border: 1px solid #dbe4ee;
+  border-radius: 22px;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.project-catalog-cta h2 {
+  margin: 0 0 0.4rem;
+  font-family: "Montserrat", sans-serif;
+  color: #1D2233;
+  font-size: 1.35rem;
+}
+
+.project-catalog-cta p {
+  margin: 0;
+  color: #4b5563;
+  max-width: 640px;
+}
+
+/* ============ School profile page ============ */
+.page-shell--school {
+  background:
+    radial-gradient(circle at top left, rgba(47, 143, 58, 0.08), transparent 28%),
+    radial-gradient(circle at top right, rgba(0, 119, 182, 0.08), transparent 26%),
+    #f8fafc;
+}
+
+.school-profile-hero,
+.school-profile-grid,
+.school-profile-section {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding-inline: 1.5rem;
+}
+
+.school-profile-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(300px, 0.8fr);
+  gap: 1.5rem;
+  align-items: stretch;
+  padding-top: 0.5rem;
+  padding-bottom: 1.5rem;
+}
+
+.school-profile-hero__eyebrow {
+  display: inline-flex;
+  margin-bottom: 0.85rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: 999px;
+  background: rgba(47, 143, 58, 0.12);
+  color: #2f8f3a;
+  font-weight: 800;
+}
+
+.school-profile-hero h1 {
+  margin: 0;
+  font-family: "Montserrat", sans-serif;
+  font-size: clamp(2.1rem, 4.6vw, 3.5rem);
+  line-height: 1.05;
+  color: #1D2233;
+}
+
+.school-profile-hero__copy > p:last-of-type {
+  margin-top: 1rem;
+  color: #4b5563;
+  font-size: 1.02rem;
+  max-width: 760px;
+}
+
+.school-profile-hero__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.school-profile-hero__meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.7rem 0.95rem;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 1px solid #dbe4ee;
+  color: #334155;
+}
+
+.school-profile-hero__meta strong {
+  font-size: 0.92rem;
+}
+
+.school-profile-hero__card,
+.school-profile-card {
+  padding: 1.25rem;
+  border-radius: 24px;
+  background: #ffffff;
+  border: 1px solid #dbe4ee;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+}
+
+.school-profile-hero__card {
+  display: grid;
+  align-content: start;
+  gap: 0.9rem;
+}
+
+.school-profile-hero__badge,
+.school-profile-card__kicker {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(0, 119, 182, 0.1);
+  color: #0077b6;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.school-profile-hero__card h2,
+.school-profile-section__header h2,
+.school-profile-card h3 {
+  margin: 0;
+  font-family: "Montserrat", sans-serif;
+  color: #1D2233;
+}
+
+.school-profile-hero__card p,
+.school-profile-section__header p,
+.school-profile-card p {
+  margin: 0;
+  color: #4b5563;
+  line-height: 1.6;
+}
+
+.school-profile-hero__actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.school-profile-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  padding-bottom: 1.5rem;
+}
+
+.school-profile-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.9rem;
+}
+
+.school-profile-card__header p {
+  color: #6b7280;
+  font-size: 0.82rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.school-profile-facts {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.school-profile-facts div {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.school-profile-facts span {
+  color: #6b7280;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.school-profile-facts strong {
+  color: #111827;
+  line-height: 1.4;
+}
+
+.school-profile-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.school-profile-tags span {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.45rem 0.78rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(47, 143, 58, 0.1), rgba(0, 119, 182, 0.1));
+  border: 1px solid rgba(0, 119, 182, 0.14);
+  color: #1f2937;
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.school-profile-card__note {
+  margin-top: 0.85rem;
+  font-size: 0.92rem;
+}
+
+.school-profile-section {
+  padding-bottom: 1.5rem;
+}
+
+.school-profile-section__header {
+  display: grid;
+  gap: 0.35rem;
+  margin-bottom: 1rem;
+}
+
+.school-profile-milestones,
+.school-profile-recommendations {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.school-profile-card--milestone {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.school-profile-milestone__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2f8f3a, #0077b6);
+  color: #ffffff;
+}
+
+.school-profile-card__subline {
+  color: #475569;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
 @media (max-width: 960px) {
   .workflow-nav--desktop {
     display: none;
@@ -2758,6 +3612,10 @@ select {
   .member-hero,
   .member-grid,
   .member-list,
+  .school-profile-grid,
+  .school-profile-milestones,
+  .school-profile-recommendations,
+  .project-catalog-grid,
   .personalized-start,
   .quick-nav-modal__content,
   .recommendation-columns,
@@ -2778,6 +3636,22 @@ select {
   .quick-nav-sidebar {
     border-right: 0;
     border-bottom: 1px solid #dbe4ee;
+  }
+
+  .projects-switcher,
+  .school-profile-hero,
+  .project-catalog-hero,
+  .project-catalog-cta {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .projects-switcher__control {
+    width: 100%;
+  }
+
+  .project-catalog-hero__actions {
+    width: 100%;
   }
 }
 

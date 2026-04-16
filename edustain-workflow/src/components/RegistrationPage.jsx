@@ -189,10 +189,6 @@ export default function RegistrationPage({ onNavigateHome, onNavigateMembers }) 
   const isCurrentStepValid = currentFields.every((field) => !errors[field]);
 
   useEffect(() => {
-    setCurrentStep((current) => Math.min(current, steps.length - 1));
-  }, [steps.length]);
-
-  useEffect(() => {
     if (submitState !== "success") {
       return undefined;
     }
@@ -223,6 +219,16 @@ export default function RegistrationPage({ onNavigateHome, onNavigateMembers }) 
         : null),
       [name]: type === "checkbox" ? checked : value,
     }));
+
+    if (name === "registrationMode") {
+      const nextSteps =
+        value === "with-code"
+          ? WITH_CODE_STEPS
+          : value === "without-code"
+            ? WITHOUT_CODE_STEPS
+            : DEFAULT_STEPS;
+      setCurrentStep((current) => Math.min(current, nextSteps.length - 1));
+    }
   };
 
   const handleFieldBlur = (event) => {

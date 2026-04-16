@@ -1,3 +1,5 @@
+import { initializeMemberProgress } from "./memberLevel.js";
+
 const MEMBER_KEY = "edustain-connect-demo-member";
 const WELCOME_KEY = "edustain-connect-demo-welcome";
 const QUICK_NAVIGATOR_SEEN_KEY = "edustain-connect-quick-nav-seen";
@@ -18,6 +20,7 @@ export function saveDemoMember(memberData) {
   localStorage.setItem(WELCOME_KEY, "pending");
   localStorage.removeItem(QUICK_NAVIGATOR_SEEN_KEY);
   localStorage.removeItem(QUICK_NAVIGATOR_ANSWERS_KEY);
+  initializeMemberProgress();
   window.sessionStorage.setItem(AUTH_SESSION_KEY, payload.email);
 }
 

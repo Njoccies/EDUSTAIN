@@ -1,8 +1,9 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   PARTNER_CATEGORIES,
   PARTNER_DIRECTORY,
 } from "../data/workflowSiteContent.js";
+import { awardMemberProgress } from "../lib/memberLevel.js";
 
 function Icon({ name }) {
   return <span className="material-icons workflow-icon">{name}</span>;
@@ -11,6 +12,10 @@ function Icon({ name }) {
 export default function PartnerSearchPage({ onNavigateHome }) {
   const [query, setQuery] = useState("");
   const [activeCategories, setActiveCategories] = useState([]);
+
+  useEffect(() => {
+    awardMemberProgress("partnerDirectory");
+  }, []);
 
   const categoryById = useMemo(
     () =>

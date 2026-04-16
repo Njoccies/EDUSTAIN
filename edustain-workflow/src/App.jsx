@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import MemberAreaPage from "./components/MemberAreaPage.jsx";
 import PartnerSearchPage from "./components/PartnerSearchPage.jsx";
+import ProjectCatalogPage from "./components/ProjectCatalogPage.jsx";
 import QuickNavigatorModal from "./components/QuickNavigatorModal.jsx";
 import RegistrationPage from "./components/RegistrationPage.jsx";
+import SchoolProfilePage from "./components/SchoolProfilePage.jsx";
 import WorkflowHeader from "./components/WorkflowHeader.jsx";
 import WebsiteHome from "./components/WebsiteHome.jsx";
 import { NAV_TABS } from "./data/workflowSiteContent.js";
@@ -12,6 +14,7 @@ import {
   resetQuickNavigator,
   saveQuickNavigatorAnswers,
 } from "./lib/demoSession.js";
+import { awardMemberProgress } from "./lib/memberLevel.js";
 import ProjectsPlannerTab from "./ProjectsPlannerTab.jsx";
 
 function normalizePath(pathname) {
@@ -36,6 +39,7 @@ export default function EdustainConnect() {
   const [quickNavAnswers, setQuickNavAnswers] = useState(() => getQuickNavigatorAnswers());
   const [quickNavigatorOpen, setQuickNavigatorOpen] = useState(false);
   const [quickNavigatorSource, setQuickNavigatorSource] = useState("homepage");
+  const [projectsView, setProjectsView] = useState("catalog");
 
   const welcomeRef = useRef(null);
   const partnersRef = useRef(null);
@@ -117,6 +121,11 @@ export default function EdustainConnect() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const navigateHome = () => {
+    setActiveTab("wsa");
+    navigateTo("/");
+  };
+
   const handleTabChange = (id) => {
     if (pathname !== "/") {
       navigateTo("/");
@@ -126,6 +135,13 @@ export default function EdustainConnect() {
     setMobileMenuOpen(false);
 
     if (id === "projekte") {
+      setProjectsView("catalog");
+      setPendingSectionId(null);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
+    if (id === "schule") {
       setPendingSectionId(null);
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
@@ -159,6 +175,7 @@ export default function EdustainConnect() {
     const shouldMarkSeen = quickNavigatorSource === "member";
 
     saveQuickNavigatorAnswers(answers, { markSeen: shouldMarkSeen });
+    awardMemberProgress("quickNavigator");
     setQuickNavAnswers(answers);
     setQuickNavigatorOpen(false);
   };
@@ -180,10 +197,7 @@ export default function EdustainConnect() {
         mobileMenuOpen={mobileMenuOpen}
         onToggleMobileMenu={() => setMobileMenuOpen((current) => !current)}
         scrolled={scrolled}
-        onHomeClick={() => {
-          setActiveTab("wsa");
-          navigateTo("/");
-        }}
+        onHomeClick={navigateHome}
         onMembersClick={() => navigateTo("/mitgliederbereich")}
         onRegistrationClick={() => navigateTo("/registrierung")}
         showTabs={pathname === "/"}
@@ -203,9 +217,25 @@ export default function EdustainConnect() {
           quickNavAnswers={quickNavAnswers}
         />
       ) : pathname === "/partner" ? (
-        <PartnerSearchPage onNavigateHome={() => navigateTo("/")} />
+        <PartnerSearchPage onNavigateHome={navigateHome} />
+      ) : activeTab === "schule" ? (
+        <SchoolProfilePage
+          onNavigateRegistration={() => navigateTo("/registrierung")}
+          onOpenProjects={() => handleTabChange("projekte")}
+        />
       ) : activeTab === "projekte" ? (
-        <ProjectsPlannerTab />
+        projectsView === "catalog" ? (
+          <ProjectCatalogPage
+            currentView={projectsView}
+            onChangeView={setProjectsView}
+            onNavigateHome={navigateHome}
+          />
+        ) : (
+          <ProjectsPlannerTab
+            currentView={projectsView}
+            onChangeView={setProjectsView}
+          />
+        )
       ) : (
         <WebsiteHome
           welcomeRef={welcomeRef}

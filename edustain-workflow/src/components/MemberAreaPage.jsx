@@ -5,6 +5,12 @@ import {
 } from "../data/workflowSiteContent.js";
 import { getQuickNavigatorRecommendations } from "../lib/quickNavigator.js";
 import {
+  awardMemberProgress,
+  getLevelFromPoints,
+  getMemberProgress,
+  getProgressHighlights,
+} from "../lib/memberLevel.js";
+import {
   consumeWelcomeBanner,
   getDemoMember,
   isDemoMemberAuthenticated,
@@ -46,6 +52,9 @@ export default function MemberAreaPage({
   const guestLoginEmailInputRef = useRef(null);
 
   const quickNavRecommendations = getQuickNavigatorRecommendations(quickNavAnswers);
+  const memberProgress = getMemberProgress();
+  const memberLevel = getLevelFromPoints(memberProgress.points);
+  const memberHighlights = getProgressHighlights(memberProgress);
 
   useEffect(() => {
     if (!member || !isAuthenticated || hasAutoOpenedQuickNavigatorRef.current || !shouldShowQuickNavigator()) {
@@ -76,6 +85,7 @@ export default function MemberAreaPage({
     }
 
     setLoginError("");
+    awardMemberProgress("firstLogin");
     hasAutoOpenedQuickNavigatorRef.current = false;
     setIsAuthenticated(true);
     setShowWelcomeBanner(consumeWelcomeBanner());
@@ -410,10 +420,42 @@ export default function MemberAreaPage({
           <div>
             <p className="member-hero__eyebrow">Mitgliederbereich</p>
             <h1>Willkommen zurück, {member.firstName}</h1>
-            <p>
-              Dieser Bereich simuliert einen geschützten Zugang für registrierte Personen. Die
-              Inhalte sind Platzhalter, damit der Ablauf realistisch wirkt.
-            </p>
+
+            <div className={`member-level member-level--${memberLevel.tierId}`}>
+              <div className="member-level__header">
+                <div className="member-level__header-main">
+                  <div className="member-level__icon">
+                    <Icon name="military_tech" />
+                  </div>
+                  <div>
+                    <p className="member-level__eyebrow">Community-Level</p>
+                    <strong>{memberLevel.label}</strong>
+                  </div>
+                </div>
+                <span>{memberProgress.points} Punkte</span>
+              </div>
+
+              <div className="member-level__bar">
+                <div
+                  className="member-level__bar-fill"
+                  style={{ width: `${memberLevel.progressPercent}%` }}
+                />
+              </div>
+
+              <p className="member-level__next">
+                {memberLevel.nextLabel
+                  ? `Noch ${memberLevel.pointsToNextLevel} Punkte bis ${memberLevel.nextLabel}`
+                  : "Hoechste Stufe erreicht"}
+              </p>
+
+              {memberHighlights.length > 0 && (
+                <div className="member-level__highlights">
+                  {memberHighlights.map((highlight) => (
+                    <span key={highlight}>{highlight}</span>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
           <div className="member-profile-card">
             <span className="member-profile-card__badge">Aktiv</span>
