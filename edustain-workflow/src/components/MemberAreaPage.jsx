@@ -283,14 +283,6 @@ export default function MemberAreaPage({
 
               {loginError ? <p className="field-error">{loginError}</p> : null}
 
-              <div className="member-login-panel__hint">
-                <strong>Demo-Hinweis</strong>
-                <p>
-                  Es findet keine echte Authentifizierung statt. Die Eingaben werden nur im
-                  Frontend mit dem gespeicherten Demo-Zugang abgeglichen.
-                </p>
-              </div>
-
               <div className="member-access-card__actions member-access-card__actions--login">
                 <button className="button button--primary" type="submit">
                   <Icon name="login" />
