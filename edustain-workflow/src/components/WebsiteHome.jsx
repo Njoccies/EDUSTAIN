@@ -2,6 +2,8 @@ import {
   BENEFITS,
   NAVIGATION_SYSTEM_ITEMS,
   PARTNERS,
+  PARTNER_CATEGORIES,
+  PARTNER_DIRECTORY,
 } from "../data/workflowSiteContent.js";
 
 function Icon({ name }) {
@@ -19,13 +21,19 @@ function PartnerLogo({ partner }) {
 
 export default function WebsiteHome({
   welcomeRef,
-  registrationRef,
+  partnersRef,
   navigationRef,
   onOpenProjects,
   onOpenRegistration,
-  onOpenMembers,
   onOpenQuickNavigator,
+  onOpenPartners,
 }) {
+  const featuredPartners = PARTNER_DIRECTORY.slice(0, 3);
+  const categoryById = PARTNER_CATEGORIES.reduce((acc, cat) => {
+    acc[cat.id] = cat;
+    return acc;
+  }, {});
+  const featuredCategories = PARTNER_CATEGORIES.slice(0, 6);
   return (
     <div className="site-shell">
       <section className="hero-banner">
@@ -70,53 +78,81 @@ export default function WebsiteHome({
           </div>
         </section>
 
-        <section className="content-section content-section--bordered" ref={registrationRef} id="registration">
-          <h2>Community-Zugang</h2>
-          <p>
-            Du möchtest mit deiner Schule Teil der Whole School Approach Community werden? Dann
-            starte jetzt den separaten Registrierungsprozess als klickbaren Demo-Flow.
-          </p>
-          <div className="registration-cta-card">
-            <div className="registration-cta-card__content">
-              <div className="registration-cta-card__badge">
-                <Icon name="how_to_reg" />
-                <span>4 Schritte</span>
-              </div>
-              <h3>Eigenständige Registrierungsseite</h3>
-              <p>
-                Der neue Ablauf führt Schritt für Schritt durch persönliche Daten, schulische
-                Informationen, Projektgruppe und rechtliche Zustimmung. Alles ist vollständig im
-                Frontend simuliert.
-              </p>
-              <div className="registration-cta-card__actions">
-                <button className="button button--primary" onClick={onOpenRegistration} type="button">
-                  <Icon name="arrow_forward" />
-                  <span>Jetzt registrieren</span>
-                </button>
-                <button className="button button--ghost" onClick={onOpenMembers} type="button">
-                  <Icon name="lock_open" />
-                  <span>Mitgliederbereich ansehen</span>
-                </button>
-              </div>
+        <section className="content-section content-section--bordered partner-widget" ref={partnersRef} id="partners">
+          <div className="partner-widget__intro">
+            <p className="partner-widget__eyebrow">Partner für Schulen</p>
+            <h2>Finde Partner für dein nächstes BNE-Vorhaben</h2>
+            <p>
+              Externe Expert*innen, Lernorte und Förderer aus unterschiedlichsten Branchen –
+              gebündelt in einem Verzeichnis. Durchsuche die Partner nach Thema, Region und Format.
+            </p>
+          </div>
+
+          <div className="partner-widget__search">
+            <div className="partner-widget__search-field">
+              <Icon name="search" />
+              <input
+                type="text"
+                placeholder="Suche nach Name, Thema oder Region..."
+                onFocus={onOpenPartners}
+                readOnly
+              />
             </div>
-            <div className="registration-cta-card__steps">
-              <div>
-                <strong>1.</strong>
-                <span>Persönliche Daten</span>
-              </div>
-              <div>
-                <strong>2.</strong>
-                <span>Schulische Informationen</span>
-              </div>
-              <div>
-                <strong>3.</strong>
-                <span>Projektgruppe</span>
-              </div>
-              <div>
-                <strong>4.</strong>
-                <span>AGB und Datenschutz</span>
-              </div>
-            </div>
+            <button className="button button--primary" onClick={onOpenPartners} type="button">
+              <Icon name="travel_explore" />
+              <span>Partner suchen</span>
+            </button>
+          </div>
+
+          <div className="partner-widget__categories">
+            {featuredCategories.map((cat) => (
+              <button
+                key={cat.id}
+                type="button"
+                className={`partner-chip partner-chip--${cat.accent}`}
+                onClick={onOpenPartners}
+              >
+                <span className="material-icons">{cat.icon}</span>
+                <span>{cat.label}</span>
+              </button>
+            ))}
+            <button type="button" className="partner-chip partner-chip--more" onClick={onOpenPartners}>
+              <Icon name="more_horiz" />
+              <span>Weitere Kategorien</span>
+            </button>
+          </div>
+
+          <div className="partner-widget__featured">
+            {featuredPartners.map((partner) => {
+              const cat = categoryById[partner.category];
+              return (
+                <article key={partner.id} className={`partner-card partner-card--${cat?.accent ?? "default"}`}>
+                  <div className="partner-card__head">
+                    <span className={`partner-card__badge partner-card__badge--${cat?.accent ?? "default"}`}>
+                      <span className="material-icons">{cat?.icon ?? "handshake"}</span>
+                      <span>{cat?.label ?? "Partner"}</span>
+                    </span>
+                    <span className="partner-card__region">{partner.region}</span>
+                  </div>
+                  <h3>{partner.name}</h3>
+                  <p className="partner-card__type">{partner.type}</p>
+                  <p className="partner-card__desc">{partner.description}</p>
+                  <div className="partner-card__tags">
+                    {partner.offerings.slice(0, 3).map((tag) => (
+                      <span key={tag}>{tag}</span>
+                    ))}
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+
+          <div className="partner-widget__footer">
+            <button className="button button--ghost" onClick={onOpenPartners} type="button">
+              <Icon name="arrow_forward" />
+              <span>Zum vollständigen Partnerverzeichnis</span>
+            </button>
+            <span className="partner-widget__count">{PARTNER_DIRECTORY.length} Partner im Demo-Verzeichnis</span>
           </div>
         </section>
 

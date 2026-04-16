@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import MemberAreaPage from "./components/MemberAreaPage.jsx";
+import PartnerSearchPage from "./components/PartnerSearchPage.jsx";
 import QuickNavigatorModal from "./components/QuickNavigatorModal.jsx";
 import RegistrationPage from "./components/RegistrationPage.jsx";
 import WorkflowHeader from "./components/WorkflowHeader.jsx";
@@ -20,6 +21,9 @@ function normalizePath(pathname) {
   if (pathname === "/mitgliederbereich") {
     return "/mitgliederbereich";
   }
+  if (pathname === "/partner") {
+    return "/partner";
+  }
   return "/";
 }
 
@@ -34,7 +38,7 @@ export default function EdustainConnect() {
   const [quickNavigatorSource, setQuickNavigatorSource] = useState("homepage");
 
   const welcomeRef = useRef(null);
-  const registrationRef = useRef(null);
+  const partnersRef = useRef(null);
   const navigationRef = useRef(null);
 
   useEffect(() => {
@@ -63,6 +67,10 @@ export default function EdustainConnect() {
       document.title = "Mitgliederbereich | EDUSTAIN-Connect";
       return;
     }
+    if (pathname === "/partner") {
+      document.title = "Partner | EDUSTAIN-Connect";
+      return;
+    }
     document.title = "EDUSTAIN-Connect";
   }, [pathname]);
 
@@ -75,8 +83,8 @@ export default function EdustainConnect() {
     if (pendingSectionId === "welcome") {
       target = welcomeRef.current;
     }
-    if (pendingSectionId === "registration") {
-      target = registrationRef.current;
+    if (pendingSectionId === "partners") {
+      target = partnersRef.current;
     }
     if (pendingSectionId === "navigation") {
       target = navigationRef.current;
@@ -194,17 +202,19 @@ export default function EdustainConnect() {
           onRestartQuickNavigator={() => openQuickNavigator("member", { restart: true })}
           quickNavAnswers={quickNavAnswers}
         />
+      ) : pathname === "/partner" ? (
+        <PartnerSearchPage onNavigateHome={() => navigateTo("/")} />
       ) : activeTab === "projekte" ? (
         <ProjectsPlannerTab />
       ) : (
         <WebsiteHome
           welcomeRef={welcomeRef}
-          registrationRef={registrationRef}
+          partnersRef={partnersRef}
           navigationRef={navigationRef}
           onOpenProjects={() => handleTabChange("projekte")}
           onOpenRegistration={() => navigateTo("/registrierung")}
-          onOpenMembers={() => navigateTo("/mitgliederbereich")}
           onOpenQuickNavigator={() => openQuickNavigator("homepage", { restart: true })}
+          onOpenPartners={() => navigateTo("/partner")}
         />
       )}
     </div>

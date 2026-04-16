@@ -1,772 +1,1106 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { STATES } from "./data/workflowSiteContent.js";
 
-const phases = [
+const STEPS = [
+  { id: "basis", label: "Basisangaben" },
+  { id: "intro", label: "Vorstellung" },
+  { id: "context", label: "Verortung" },
+  { id: "content", label: "Projektinhalt" },
+  { id: "organisation", label: "Organisation & Abschluss" },
+];
+
+const STEP_FIELDS = [
+  ["projectStatus", "visibility", "projectName", "state"],
+  ["teaser", "contactName"],
+  ["navigatorCards"],
+  ["description"],
+  ["participants", "execution", "funding"],
+];
+
+const PROJECT_STATUS_OPTIONS = [
   {
-    id: 1,
-    title: "Projekt anlegen",
-    subtitle: "Idee & Rahmen definieren",
-    icon: "🌱",
-    color: "#224DB7",
-    lightColor: "#E8EDF8",
-    description:
-      "Der Lehrer erstellt ein neues Nachhaltigkeitsprojekt und definiert Titel, Beschreibung und Themenfeld. Edustain bietet Vorlagen aus vergangenen Projekten als Inspiration.",
-    mockup: "project_create",
+    value: "kickoff",
+    icon: "rocket_launch",
+    title: "Beginn / In Planung",
+    description: "Das Projekt startet gerade / in Vorbereitung.",
   },
   {
-    id: 2,
-    title: "Partner finden",
-    subtitle: "NGOs & Umsetzungspartner",
-    icon: "🤝",
-    color: "#1739A5",
-    lightColor: "#DDE4F5",
-    description:
-      "Basierend auf Themenfeld und Region schlägt Edustain automatisch passende NGOs und Umsetzungspartner vor - aus einer Datenbank vergangener Projekte und Listings.",
-    mockup: "partner_find",
+    value: "active",
+    icon: "play_circle",
+    title: "Aktiv",
+    description: "Das Projekt läuft aktuell an der Schule.",
   },
   {
-    id: 3,
-    title: "Schritte planen",
-    subtitle: "Aufgaben & Kosten strukturieren",
-    icon: "📋",
-    color: "#445588",
-    lightColor: "#E8EDF8",
-    description:
-      "Einzelne Aufgabenschritte werden definiert, mit Zeitrahmen und Kostenschätzung versehen. Jeder Schritt wird einer verantwortlichen Person zugeordnet.",
-    mockup: "step_plan",
-  },
-  {
-    id: 4,
-    title: "Aufgaben zuweisen",
-    subtitle: "Lehrer- & Schüleraufgaben trennen",
-    icon: "👩‍🏫",
-    color: "#72ab47",
-    lightColor: "#EAF4DF",
-    description:
-      "Aufgaben werden als Lehrer- oder Schüleraufgaben markiert. Schüleraufgaben werden automatisch als druckbare Aufgabenblätter formatiert - mit Anleitung, Checkliste und Platz für Notizen.",
-    mockup: "task_assign",
-  },
-  {
-    id: 5,
-    title: "Exportieren & Umsetzen",
-    subtitle: "PDF-Export & Druck",
-    icon: "🖨️",
-    color: "#38454A",
-    lightColor: "#ECEEEF",
-    description:
-      "Der komplette Projektplan sowie die einzelnen Aufgabenblätter für Schüler können als PDF exportiert und direkt ausgedruckt werden. Die Umsetzung kann beginnen!",
-    mockup: "export",
+    value: "completed",
+    icon: "check_circle",
+    title: "Abgeschlossen",
+    description: "Das Projekt oder Konzept ist bereits durchgeführt.",
   },
 ];
 
-const inputStyle = {
-  width: "100%",
-  boxSizing: "border-box",
-  padding: "0.9rem 1rem",
-  border: "1px solid #cbd5e1",
-  borderRadius: 16,
-  fontSize: 14,
-  color: "#111827",
-  background: "#ffffff",
-  fontFamily: "'Nunito Sans', sans-serif",
-  outline: "none",
+const VISIBILITY_OPTIONS = [
+  {
+    value: "public",
+    icon: "public",
+    title: "Öffentlich",
+    description:
+      "Für alle EDUSTAIN-Connect Besucher*innen sichtbar.",
+  },
+  {
+    value: "private",
+    icon: "lock",
+    title: "Privat",
+    description:
+      "Für alle EDUSTAIN-Connect Nutzer*innen sichtbar.",
+  },
+  {
+    value: "internal",
+    icon: "groups",
+    title: "Intern",
+    description:
+      "Nur für die eigene Schule und zugeordnete Projektgruppen sichtbar.",
+  },
+];
+
+const FUNDING_OPTIONS = [
+  {
+    value: "self",
+    icon: "savings",
+    title: "Selbst finanziert",
+    description: "Eigenmittel der Schule oder Schulgemeinschaft.",
+  },
+  {
+    value: "subsidized",
+    icon: "volunteer_activism",
+    title: "Über Fördermittel finanziert",
+    description: "Stiftungen, Programme oder öffentliche Mittel.",
+  },
+];
+
+const EXECUTION_OPTIONS = [
+  {
+    value: "internal",
+    icon: "school",
+    title: "Intern durchgeführt",
+    description: "Die Schule setzt das Projekt eigenständig um.",
+  },
+  {
+    value: "external",
+    icon: "handshake",
+    title: "Mit externem Partner",
+    description:
+      "NGO, Verein, Bildungsträger oder Unternehmen führen gemeinsam durch.",
+  },
+  {
+    value: "cooperation",
+    icon: "diversity_3",
+    title: "Kooperation mit anderer Schule",
+    description: "Zwei oder mehr Schulen setzen gemeinsam um.",
+  },
+];
+
+const NAVIGATOR_CARDS = [
+  {
+    title: "Unterricht & Lernangebote",
+    description:
+      "BNE-Inhalte, Projektunterricht und fächerübergreifende Lernangebote.",
+  },
+  {
+    title: "Nachhaltiges Schulmanagement",
+    description: "Strategie, Leitbild und Steuerung auf Schulebene.",
+  },
+  {
+    title: "Schulische Sozialarbeit",
+    description: "Begleitung, Beratung und soziale Teilhabe im Schulalltag.",
+  },
+  {
+    title: "Nachhaltige bauliche Gestaltung",
+    description: "Gebäude, Außenflächen und Energieeffizienz der Schule.",
+  },
+  {
+    title: "Nachhaltiges Schulleben",
+    description: "Veranstaltungen, Rituale und Schulkultur mit BNE-Fokus.",
+  },
+  {
+    title: "Nachhaltige Ausstattung & Bewirtschaftung",
+    description: "Beschaffung, Materialien, Mensa und Ressourcennutzung.",
+  },
+  {
+    title: "Netzwerke & Kooperationen",
+    description: "Austausch mit Partnern, Kommunen und anderen Schulen.",
+  },
+];
+
+const PARTICIPANTS = [
+  "Lehrkräfte",
+  "Schulleitung",
+  "Schüler*innen",
+  "Eltern",
+  "Schulsozialarbeit",
+  "Schulverwaltungspersonal",
+  "Schulträger",
+  "Außerschulische Bildungspartner",
+  "Nachmittagsbetreuung",
+  "Kommune",
+  "Vereine / NGOs",
+  "Caterer",
+  "Sonstiges",
+];
+
+const INITIAL_FORM = {
+  projectStatus: "",
+  visibility: "",
+  projectName: "",
+  titleImage: "",
+  state: "",
+  teaser: "",
+  contactName: "",
+  contactEmail: "",
+  contactPhone: "",
+  navigatorCards: [],
+  okrSet: "",
+  timeline: "",
+  description: "",
+  learnings: "",
+  participants: [],
+  execution: "",
+  executionPartners: "",
+  funding: "",
+  gallery: "",
 };
 
-const tagStyle = (active) => ({
-  padding: "0.45rem 0.85rem",
-  borderRadius: 999,
-  fontSize: 13,
-  fontWeight: 800,
-  background: active ? "linear-gradient(135deg, #2f8f3a, #0077b6)" : "transparent",
-  color: active ? "#fff" : "#374151",
-  border: active ? "1px solid transparent" : "1px solid #d1d5db",
-  cursor: "pointer",
-  fontFamily: "'Nunito Sans', sans-serif",
-});
+const MAX_NAME = 50;
+const MAX_TEASER = 200;
 
-const MockupProjectCreate = () => (
-  <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-      <label style={{ fontSize: 11, fontWeight: 800, color: "#4b5563", textTransform: "uppercase", letterSpacing: 1.2, fontFamily: "'Montserrat', sans-serif" }}>
-        Projektname
-      </label>
-      <div style={{ ...inputStyle, color: "#0077b6", fontWeight: 500 }}>
-        Schulhof-Biodiversitätsgarten
-      </div>
-    </div>
-    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-      <label style={{ fontSize: 11, fontWeight: 800, color: "#4b5563", textTransform: "uppercase", letterSpacing: 1.2, fontFamily: "'Montserrat', sans-serif" }}>
-        Themenfeld
-      </label>
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-        {["Biodiversität", "Energie", "Ernährung", "Mobilität", "Konsum"].map((topic, index) => (
-          <span key={topic} style={tagStyle(index === 0)}>
-            {topic}
-          </span>
-        ))}
-      </div>
-    </div>
-    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-      <label style={{ fontSize: 11, fontWeight: 800, color: "#4b5563", textTransform: "uppercase", letterSpacing: 1.2, fontFamily: "'Montserrat', sans-serif" }}>
-        Kurzbeschreibung
-      </label>
-      <div style={{ ...inputStyle, minHeight: 52, color: "#374151", lineHeight: 1.6 }}>
-        Wir gestalten einen Teil des Schulhofs als Biodiversitätsgarten mit heimischen Pflanzen, Insektenhotel und Kompoststation...
-      </div>
-    </div>
-    <div style={{ display: "flex", gap: 8, marginTop: 2 }}>
-      <span
-        style={{
-          background: "#e9f6ec",
-          border: "1px solid #b5d98b",
-          borderRadius: 999,
-          padding: "0.4rem 0.8rem",
-          fontSize: 12,
-          color: "#2f8f3a",
-          fontFamily: "'Nunito Sans', sans-serif",
-          fontWeight: 500,
-        }}
-      >
-        📄 3 ähnliche Projekte als Vorlage verfügbar
-      </span>
-    </div>
-  </div>
-);
+function Icon({ name }) {
+  return <span className="material-icons workflow-icon">{name}</span>;
+}
 
-const PartnerCard = ({ partner }) => (
-  <div
-    style={{
-      background: "#f8fafb",
-      borderRadius: 20,
-      padding: "14px 18px",
-      border: "1px solid #e8edf2",
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-    }}
-  >
-    <div>
-      <div style={{ fontWeight: 800, fontSize: 14, color: "#111827", fontFamily: "'Nunito Sans', sans-serif" }}>
-        {partner.name}
-      </div>
-      <div style={{ display: "flex", gap: 6, marginTop: 5, flexWrap: "wrap" }}>
-        <span
-          style={{
-            fontSize: 10,
-            background: "rgba(0, 119, 182, 0.1)",
-            color: "#0077b6",
-            padding: "2px 8px",
-            borderRadius: 999,
-            fontWeight: 800,
-          }}
-        >
-          {partner.type}
-        </span>
-        {partner.tags.map((tag) => (
-          <span
-            key={tag}
-            style={{ fontSize: 10, background: "#e9f6ec", color: "#2f8f3a", padding: "2px 8px", borderRadius: 999 }}
-          >
-            {tag}
-          </span>
-        ))}
-      </div>
-    </div>
-    <div
-      style={{
-        background: `conic-gradient(#0077b6 ${partner.match * 3.6}deg, #e5e7eb 0deg)`,
-        width: 40,
-        height: 40,
-        borderRadius: "50%",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        flexShrink: 0,
-        marginLeft: 12,
-      }}
-    >
-      <div
-        style={{
-          background: "#f8fafb",
-          width: 30,
-          height: 30,
-          borderRadius: "50%",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontSize: 10,
-          fontWeight: 800,
-          color: "#0077b6",
-        }}
-      >
-        {partner.match}%
-      </div>
-    </div>
-  </div>
-);
+function isValidEmail(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
 
-const MockupPartnerFind = () => {
-  const [query, setQuery] = useState("");
-  const allPartners = [
-    { name: "NABU Ortsgruppe Freiburg", type: "NGO", match: 94, tags: ["Biodiversität", "Gartenprojekte"] },
-    { name: "Bodensee-Stiftung", type: "Stiftung", match: 87, tags: ["Ökosysteme", "Schulprojekte"] },
-    { name: "GartenWerkStadt e.V.", type: "Verein", match: 82, tags: ["Urban Gardening", "Kompost"] },
-  ];
+function validateField(name, formData) {
+  const value = formData[name];
 
-  const searchResults = query.trim()
-    ? allPartners.filter((partner) => {
-        const normalizedQuery = query.toLowerCase();
+  if (name === "projectStatus" && !value) {
+    return "Bitte wähle den Projekt-Status.";
+  }
+  if (name === "visibility" && !value) {
+    return "Bitte wähle, ob euer Projekt öffentlich oder privat ist.";
+  }
+  if (name === "projectName") {
+    if (value.trim().length === 0) {
+      return "Bitte gib dem Projekt einen Titel.";
+    }
+    if (value.length > MAX_NAME) {
+      return `Der Titel darf maximal ${MAX_NAME} Zeichen lang sein.`;
+    }
+  }
+  if (name === "state" && value.trim().length === 0) {
+    return "Bitte wähle das Bundesland, in dem das Projekt stattfindet.";
+  }
+  if (name === "teaser") {
+    if (value.trim().length === 0) {
+      return "Bitte formuliere eine kurze Teaser-Beschreibung.";
+    }
+    if (value.length > MAX_TEASER) {
+      return `Der Teaser darf maximal ${MAX_TEASER} Zeichen lang sein.`;
+    }
+  }
+  if (name === "contactName" && value.trim().length === 0) {
+    return "Bitte gib den Namen der Ansprechpartner*in an.";
+  }
+  if (name === "contactEmail" && value.trim().length > 0 && !isValidEmail(value)) {
+    return "Bitte gib eine gültige E-Mail-Adresse ein.";
+  }
+  if (name === "navigatorCards" && value.length === 0) {
+    return "Bitte wähle mindestens eine passende Navigator-Karte.";
+  }
+  if (name === "description" && value.trim().length === 0) {
+    return "Bitte beschreibe euer Projekt oder Konzept im Detail.";
+  }
+  if (name === "participants" && value.length === 0) {
+    return "Bitte gib an, wer am Projekt beteiligt ist.";
+  }
+  if (name === "execution" && !value) {
+    return "Bitte wähle, wie das Projekt durchgeführt wird.";
+  }
+  if (name === "funding" && !value) {
+    return "Bitte wähle eine Finanzierungsform.";
+  }
+
+  return "";
+}
+
+function collectErrors(formData) {
+  return Object.keys(formData).reduce((accumulator, fieldName) => {
+    const error = validateField(fieldName, formData);
+    if (error) {
+      accumulator[fieldName] = error;
+    }
+    return accumulator;
+  }, {});
+}
+
+function charCountClass(length, max) {
+  if (length >= max) return "char-count is-max";
+  if (length >= max * 0.85) return "char-count is-warn";
+  return "char-count";
+}
+
+function Stepper({ currentStep }) {
+  return (
+    <ol className="registration-stepper" aria-label="Leitfaden-Schritte">
+      {STEPS.map((step, index) => {
+        const state =
+          index < currentStep
+            ? "done"
+            : index === currentStep
+              ? "active"
+              : "upcoming";
         return (
-          partner.name.toLowerCase().includes(normalizedQuery) ||
-          partner.type.toLowerCase().includes(normalizedQuery) ||
-          partner.tags.some((tag) => tag.toLowerCase().includes(normalizedQuery))
+          <li
+            key={step.id}
+            className={`registration-stepper__item is-${state}`}
+          >
+            <div className="registration-stepper__marker">
+              {state === "done" ? <Icon name="check" /> : <span>{index + 1}</span>}
+            </div>
+            <div className="registration-stepper__copy">
+              <p>Schritt {index + 1}</p>
+              <strong>{step.label}</strong>
+            </div>
+          </li>
         );
-      })
-    : null;
-
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-      <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 4 }}>
-        <label style={{ fontSize: 11, fontWeight: 800, color: "#4b5563", textTransform: "uppercase", letterSpacing: 1.2, fontFamily: "'Montserrat', sans-serif" }}>
-          Partner manuell suchen
-        </label>
-        <div style={{ position: "relative" }}>
-          <span
-            style={{
-              position: "absolute",
-              left: 12,
-              top: "50%",
-              transform: "translateY(-50%)",
-              fontSize: 14,
-              color: "#cbd5e1",
-              pointerEvents: "none",
-            }}
-          >
-            🔍
-          </span>
-          <input
-            type="text"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Name, Typ oder Thema eingeben..."
-            style={{ ...inputStyle, paddingLeft: 36, transition: "border-color 0.2s" }}
-            onFocus={(event) => {
-              event.target.style.borderColor = "#0077b6";
-              event.target.style.outline = "2px solid rgba(0, 119, 182, 0.18)";
-            }}
-            onBlur={(event) => {
-              event.target.style.borderColor = "#cbd5e1";
-              event.target.style.outline = "none";
-            }}
-          />
-          {query && (
-            <button
-              onClick={() => setQuery("")}
-              style={{
-                position: "absolute",
-                right: 10,
-                top: "50%",
-                transform: "translateY(-50%)",
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                fontSize: 14,
-                color: "#cbd5e1",
-                padding: "0 4px",
-                lineHeight: 1,
-              }}
-            >
-              ✕
-            </button>
-          )}
-        </div>
-      </div>
-
-      {searchResults !== null && (
-        <>
-          <div style={{ fontSize: 11, color: "#4b5563", fontWeight: 800, textTransform: "uppercase", letterSpacing: 1.2, marginBottom: 2, fontFamily: "'Montserrat', sans-serif" }}>
-            {searchResults.length > 0 ? `${searchResults.length} Ergebnis${searchResults.length !== 1 ? "se" : ""} gefunden` : "Keine Ergebnisse"}
-          </div>
-          {searchResults.length === 0 ? (
-            <div
-              style={{
-                background: "#f3f4f6",
-                borderRadius: 20,
-                padding: "14px 16px",
-                fontSize: 13,
-                color: "#6b7280",
-                textAlign: "center",
-                border: "1px dashed #d1d5db",
-              }}
-            >
-              Kein Partner gefunden - andere Suche versuchen
-            </div>
-          ) : (
-            searchResults.map((partner) => <PartnerCard key={partner.name} partner={partner} />)
-          )}
-          <div style={{ height: 1, background: "#e5e7eb", margin: "4px 0" }} />
-        </>
-      )}
-
-      <div style={{ fontSize: 11, color: "#2f8f3a", fontWeight: 800, textTransform: "uppercase", letterSpacing: 1.2, marginBottom: 2, fontFamily: "'Montserrat', sans-serif" }}>
-        ✨ KI-Vorschläge basierend auf vergangenen Projekten
-      </div>
-      {allPartners.map((partner) => (
-        <PartnerCard key={partner.name} partner={partner} />
-      ))}
-    </div>
+      })}
+    </ol>
   );
-};
-
-const MockupStepPlan = () => {
-  const steps = [
-    { step: "Bestandsaufnahme Schulhof", who: "Schüler", days: "3 Tage", cost: "0 €", done: true },
-    { step: "Pflanzplan erstellen", who: "Lehrer + NABU", days: "5 Tage", cost: "0 €", done: true },
-    { step: "Material beschaffen", who: "Lehrer", days: "7 Tage", cost: "280 €", done: false },
-    { step: "Beete anlegen & bepflanzen", who: "Schüler", days: "2 Tage", cost: "0 €", done: false },
-    { step: "Insektenhotel bauen", who: "Schüler", days: "3 Tage", cost: "45 €", done: false },
-  ];
-
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
-      {steps.map((step, index) => (
-        <div
-          key={step.step}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 12,
-            padding: "10px 0",
-            borderBottom: index < steps.length - 1 ? "1px solid #e5e7eb" : "none",
-          }}
-        >
-          <div
-            style={{
-              width: 28,
-              height: 28,
-              borderRadius: "50%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              background: step.done ? "linear-gradient(135deg, #2f8f3a, #0077b6)" : "#f3f4f6",
-              color: step.done ? "#fff" : "#d1d5db",
-              fontSize: 13,
-              fontWeight: 800,
-              flexShrink: 0,
-            }}
-          >
-            {step.done ? "✓" : index + 1}
-          </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 13, fontWeight: 800, color: "#111827", fontFamily: "'Nunito Sans', sans-serif" }}>
-              {step.step}
-            </div>
-            <div style={{ fontSize: 11, color: "#6b7280", marginTop: 2 }}>
-              {step.who} · {step.days}
-            </div>
-          </div>
-          <div style={{ fontSize: 12, fontWeight: 800, color: step.cost === "0 €" ? "#d1d5db" : "#0077b6", flexShrink: 0 }}>
-            {step.cost}
-          </div>
-        </div>
-      ))}
-      <div
-        style={{
-          marginTop: 10,
-          padding: "8px 14px",
-          background: "rgba(0, 119, 182, 0.08)",
-          borderRadius: 999,
-          display: "flex",
-          justifyContent: "space-between",
-          fontSize: 12,
-          fontWeight: 800,
-          color: "#0077b6",
-        }}
-      >
-        <span>Gesamtkosten</span>
-        <span>325 €</span>
-      </div>
-    </div>
-  );
-};
-
-const MockupTaskAssign = () => {
-  const tasks = [
-    { task: "Schulhof vermessen & kartieren", type: "schueler", sheet: true },
-    { task: "Bodenproben nehmen & analysieren", type: "schueler", sheet: true },
-    { task: "Genehmigung Schulleitung einholen", type: "lehrer", sheet: false },
-    { task: "Insektenhotel: Bauanleitung folgen", type: "schueler", sheet: true },
-    { task: "Pflanzaktion koordinieren", type: "lehrer", sheet: false },
-  ];
-
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-      {tasks.map((task) => (
-        <div
-          key={task.task}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 10,
-            padding: "12px 16px",
-            background: "#f8fafb",
-            borderRadius: 20,
-            border: task.type === "schueler" ? "1px solid #b5d98b" : "1px solid #e8edf2",
-          }}
-        >
-          <span style={{ fontSize: 18, flexShrink: 0 }}>{task.type === "schueler" ? "🎒" : "👩‍🏫"}</span>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 13, fontWeight: 800, color: "#111827", fontFamily: "'Nunito Sans', sans-serif" }}>
-              {task.task}
-            </div>
-            <div style={{ fontSize: 10, color: task.type === "schueler" ? "#2f8f3a" : "#6b7280", fontWeight: 800, marginTop: 2 }}>
-              {task.type === "schueler" ? "Schüleraufgabe" : "Lehreraufgabe"}
-            </div>
-          </div>
-          {task.sheet && (
-            <div
-              style={{
-                background: "#e9f6ec",
-                borderRadius: 999,
-                padding: "4px 10px",
-                fontSize: 10,
-                fontWeight: 800,
-                color: "#2f8f3a",
-                whiteSpace: "nowrap",
-              }}
-            >
-              📄 Aufgabenblatt
-            </div>
-          )}
-        </div>
-      ))}
-    </div>
-  );
-};
-
-const MockupExport = () => (
-  <div style={{ display: "flex", flexDirection: "column", gap: 14, alignItems: "center" }}>
-    <div
-      style={{
-        background: "#FAFBFC",
-        borderRadius: 10,
-        padding: 20,
-        border: "1.5px solid #D0D8E8",
-        width: "100%",
-        display: "flex",
-        flexDirection: "column",
-        gap: 12,
-      }}
-    >
-      <div style={{ fontSize: 11, color: "#4b5563", fontWeight: 800, textTransform: "uppercase", letterSpacing: 1.2, fontFamily: "'Montserrat', sans-serif" }}>
-        Export-Optionen
-      </div>
-      {[
-        { label: "Gesamter Projektplan", desc: "Titel, Beschreibung, Schritte, Partner, Kosten", icon: "📑" },
-        { label: "Aufgabenblätter (3)", desc: "Druckfertige Arbeitsblätter für Schüler", icon: "🖨️" },
-        { label: "Kostenübersicht", desc: "Detaillierte Aufstellung aller Ausgaben", icon: "💶" },
-      ].map((entry) => (
-        <div
-          key={entry.label}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 12,
-            padding: "12px 14px",
-            background: "#f3f4f6",
-            borderRadius: 20,
-            cursor: "pointer",
-            border: "1px solid transparent",
-            transition: "all 0.2s",
-          }}
-        >
-          <span style={{ fontSize: 20 }}>{entry.icon}</span>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 13, fontWeight: 800, color: "#111827", fontFamily: "'Nunito Sans', sans-serif" }}>
-              {entry.label}
-            </div>
-            <div style={{ fontSize: 11, color: "#6b7280" }}>{entry.desc}</div>
-          </div>
-          <div
-            style={{
-              background: "linear-gradient(135deg, #2f8f3a, #0077b6)",
-              color: "#fff",
-              borderRadius: 999,
-              padding: "6px 14px",
-              fontSize: 11,
-              fontWeight: 800,
-              letterSpacing: 0.5,
-            }}
-          >
-            PDF ↓
-          </div>
-        </div>
-      ))}
-    </div>
-    <div
-      style={{
-        background: "#e9f6ec",
-        borderRadius: 999,
-        padding: "10px 18px",
-        fontSize: 12,
-        color: "#2f8f3a",
-        fontWeight: 800,
-        textAlign: "center",
-        width: "100%",
-        boxSizing: "border-box",
-      }}
-    >
-      ✅ Projekt bereit zur Umsetzung - viel Erfolg!
-    </div>
-  </div>
-);
-
-const mockupComponents = {
-  project_create: MockupProjectCreate,
-  partner_find: MockupPartnerFind,
-  step_plan: MockupStepPlan,
-  task_assign: MockupTaskAssign,
-  export: MockupExport,
-};
+}
 
 export default function ProjectsPlannerTab() {
-  const [active, setActive] = useState(0);
-  const phase = phases[active];
-  const MockupComponent = mockupComponents[phase.mockup];
+  const [currentStep, setCurrentStep] = useState(0);
+  const [formData, setFormData] = useState(INITIAL_FORM);
+  const [touched, setTouched] = useState({});
+  const [submitState, setSubmitState] = useState("idle");
+
+  const errors = useMemo(() => collectErrors(formData), [formData]);
+  const currentFields = STEP_FIELDS[currentStep];
+  const isCurrentStepValid = currentFields.every((field) => !errors[field]);
+
+  const markStepAsTouched = () => {
+    setTouched((current) => {
+      const next = { ...current };
+      currentFields.forEach((field) => {
+        next[field] = true;
+      });
+      return next;
+    });
+  };
+
+  const handleFieldChange = (event) => {
+    const { name, value, type, checked } = event.target;
+    setFormData((current) => ({
+      ...current,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  const handleFieldBlur = (event) => {
+    const { name } = event.target;
+    setTouched((current) => ({ ...current, [name]: true }));
+  };
+
+  const setFieldValue = (name, value) => {
+    setFormData((current) => ({ ...current, [name]: value }));
+    setTouched((current) => ({ ...current, [name]: true }));
+  };
+
+  const toggleArrayValue = (name, value) => {
+    setFormData((current) => {
+      const existing = current[name];
+      const next = existing.includes(value)
+        ? existing.filter((entry) => entry !== value)
+        : [...existing, value];
+      return { ...current, [name]: next };
+    });
+    setTouched((current) => ({ ...current, [name]: true }));
+  };
+
+  const handleNext = () => {
+    markStepAsTouched();
+    if (!isCurrentStepValid) {
+      return;
+    }
+    setCurrentStep((current) => Math.min(current + 1, STEPS.length - 1));
+  };
+
+  const handleBack = () => {
+    setCurrentStep((current) => Math.max(current - 1, 0));
+  };
+
+  const handleReset = () => {
+    setFormData(INITIAL_FORM);
+    setTouched({});
+    setCurrentStep(0);
+    setSubmitState("idle");
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+
+    const allTouched = {};
+    Object.keys(formData).forEach((field) => {
+      allTouched[field] = true;
+    });
+    setTouched(allTouched);
+
+    const allErrors = collectErrors(formData);
+    if (Object.keys(allErrors).length > 0) {
+      const firstBrokenStep = STEP_FIELDS.findIndex((fields) =>
+        fields.some((field) => allErrors[field]),
+      );
+      if (firstBrokenStep !== -1) {
+        setCurrentStep(firstBrokenStep);
+      }
+      return;
+    }
+
+    setSubmitState("success");
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
+  const renderError = (field) => {
+    if (!touched[field] || !errors[field]) {
+      return null;
+    }
+    return <p className="field-error">{errors[field]}</p>;
+  };
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "radial-gradient(circle at top left, rgba(47, 143, 58, 0.08), transparent 28%), radial-gradient(circle at top right, rgba(0, 119, 182, 0.08), transparent 26%), #f8fafc",
-        fontFamily: "'Nunito Sans', sans-serif",
-        padding: "104px 16px 48px",
-        boxSizing: "border-box",
-      }}
-    >
-
-      <div style={{ textAlign: "center", marginBottom: 32 }}>
-        <div
-          style={{
-            display: "inline-flex",
-            padding: "0.4rem 0.8rem",
-            borderRadius: 999,
-            background: "rgba(47, 143, 58, 0.12)",
-            color: "#2f8f3a",
-            fontWeight: 800,
-            fontSize: 12,
-            letterSpacing: "0.02em",
-            marginBottom: 12,
-          }}
-        >
-          Edustain Connect · Feature Konzept
-        </div>
-        <h1
-          style={{
-            fontFamily: "'Montserrat', sans-serif",
-            fontSize: "clamp(2rem, 5vw, 3.25rem)",
-            color: "#111827",
-            margin: 0,
-            lineHeight: 1.12,
-            fontWeight: 800,
-          }}
-        >
-          Nachhaltigkeitsprojekte
-          <br />
-          <span style={{ color: "#0077b6" }}>planen und umsetzen</span>
-        </h1>
-        <p
-          style={{
-            color: "#374151",
-            fontSize: "1.02rem",
-            marginTop: 12,
-            maxWidth: 480,
-            marginLeft: "auto",
-            marginRight: "auto",
-            lineHeight: 1.6,
-          }}
-        >
-          Von der Idee zum fertigen Aufgabenblatt - alles in Edustain
-        </p>
-      </div>
-
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          gap: 0,
-          marginBottom: 28,
-          position: "relative",
-          flexWrap: "wrap",
-        }}
-      >
-        {phases.map((phaseItem, index) => (
-          <div key={phaseItem.id} style={{ display: "flex", alignItems: "center" }}>
-            <button
-              onClick={() => setActive(index)}
-              style={{
-                width: 48,
-                height: 48,
-                borderRadius: "50%",
-                border: active === index ? "3px solid #2f8f3a" : "2px solid #d1d5db",
-                background: active === index ? "linear-gradient(135deg, #2f8f3a, #0077b6)" : active > index ? "#e5e7eb" : "#ffffff",
-                color: active === index ? "#fff" : active > index ? "#4b5563" : "#d1d5db",
-                fontSize: 20,
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                transition: "all 0.3s ease",
-                transform: active === index ? "scale(1.15)" : "scale(1)",
-                boxShadow: active === index ? "0 16px 35px rgba(15, 23, 42, 0.16)" : "none",
-              }}
-            >
-              {phaseItem.icon}
-            </button>
-            {index < phases.length - 1 && (
-              <div
-                style={{
-                  width: 24,
-                  height: 2,
-                  background: active > index ? "#0077b6" : "#e5e7eb",
-                  transition: "all 0.3s",
-                }}
-              />
-            )}
-          </div>
-        ))}
-      </div>
-
-      <div style={{ display: "flex", justifyContent: "center", marginBottom: 24, gap: 26, flexWrap: "wrap" }}>
-        {phases.map((phaseItem, index) => (
-          <div
-            key={phaseItem.id}
-            style={{ textAlign: "center", width: 68, opacity: active === index ? 1 : 0.35, transition: "all 0.3s" }}
-          >
-            <div style={{ fontSize: 10, fontWeight: 800, color: "#111827", lineHeight: 1.3 }}>{phaseItem.title}</div>
-          </div>
-        ))}
-      </div>
-
-      <div
-        style={{
-          maxWidth: 520,
-          margin: "0 auto",
-          background: "#ffffff",
-          borderRadius: 28,
-          overflow: "hidden",
-          border: "1px solid #dbe4ee",
-          boxShadow: "0 24px 50px rgba(15, 23, 42, 0.06)",
-        }}
-      >
-        <div
-          style={{
-            padding: "20px 24px 16px",
-            background: `linear-gradient(135deg, ${phase.color}18, ${phase.lightColor}CC)`,
-            borderBottom: "1px solid #e5e7eb",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
-            <span
-              style={{
-                fontSize: 11,
-                fontWeight: 800,
-                color: "#fff",
-                background: "linear-gradient(135deg, #2f8f3a, #0077b6)",
-                borderRadius: 999,
-                padding: "0.3rem 0.7rem",
-                letterSpacing: 0.5,
-              }}
-            >
-              Phase {phase.id}/5
-            </span>
-            <span style={{ fontSize: 11, color: "#4b5563" }}>{phase.subtitle}</span>
-          </div>
-          <h2
-            style={{
-              fontFamily: "'Montserrat', sans-serif",
-              fontSize: 21,
-              color: "#111827",
-              margin: 0,
-              fontWeight: 800,
-            }}
-          >
-            {phase.title}
-          </h2>
-          <p style={{ fontSize: 13, color: "#374151", lineHeight: 1.6, marginTop: 8, marginBottom: 0 }}>
-            {phase.description}
+    <div className="page-shell page-shell--registration">
+      <section className="registration-hero">
+        <div className="registration-hero__copy">
+          <p className="registration-hero__eyebrow">
+            EDUSTAIN-Connect Projekt-Leitfaden
+          </p>
+          <h1>Projekt oder Konzept strukturiert dokumentieren</h1>
+          <p>
+            Dieser Leitfaden begleitet eure Schule Frage für Frage durch den
+            Aufbau der Projektbeschreibung — von der Basisinformation bis zur
+            Veröffentlichung in der EDUSTAIN-Community. Alle Angaben bleiben im
+            Prototyp lokal.
           </p>
         </div>
+      </section>
 
-        <div style={{ padding: "20px 24px 24px" }}>
-          <div
-            style={{
-              fontSize: 10,
-              fontWeight: 800,
-              color: "#6b7280",
-              textTransform: "uppercase",
-              letterSpacing: 1.5,
-              marginBottom: 14,
-              fontFamily: "'Montserrat', sans-serif",
-            }}
-          >
-            UI Vorschau
+      <div className="registration-layout">
+        <aside className="registration-sidebar">
+          <Stepper currentStep={currentStep} />
+          <div className="registration-sidebar__hint">
+            <strong>Hinweis</strong>
+            <p>
+              Euer Projekt wird nach Abschluss in der Community sichtbar.
+              Dokumentiert so viel wie möglich — Learnings und Fuck-Up-Stories
+              helfen anderen Schulen genauso wie eure Erfolgsgeschichten.
+            </p>
           </div>
-          <MockupComponent />
-        </div>
-      </div>
+        </aside>
 
-      <div
-        style={{
-          maxWidth: 520,
-          margin: "20px auto 0",
-          display: "flex",
-          justifyContent: "space-between",
-          gap: 12,
-        }}
-      >
-        <button
-          onClick={() => setActive(Math.max(0, active - 1))}
-          disabled={active === 0}
-          style={{
-            flex: 1,
-            padding: "0.85rem 1.2rem",
-            borderRadius: 999,
-            border: "1px solid #d1d5db",
-            background: "#ffffff",
-            color: active === 0 ? "#d1d5db" : "#111827",
-            fontSize: 14,
-            fontWeight: 800,
-            cursor: active === 0 ? "default" : "pointer",
-            fontFamily: "'Nunito Sans', sans-serif",
-            transition: "transform 0.2s ease, box-shadow 0.2s ease",
-          }}
-        >
-          ← Zurück
-        </button>
-        <button
-          onClick={() => setActive(Math.min(phases.length - 1, active + 1))}
-          disabled={active === phases.length - 1}
-          style={{
-            flex: 1,
-            padding: "0.85rem 1.2rem",
-            borderRadius: 999,
-            border: "none",
-            background: active === phases.length - 1 ? "#e5e7eb" : "linear-gradient(135deg, #2f8f3a, #0077b6)",
-            color: active === phases.length - 1 ? "#9ca3af" : "#fff",
-            fontSize: 14,
-            fontWeight: 800,
-            cursor: active === phases.length - 1 ? "default" : "pointer",
-            fontFamily: "'Nunito Sans', sans-serif",
-            transition: "transform 0.2s ease, box-shadow 0.2s ease",
-            boxShadow: active < phases.length - 1 ? "0 16px 35px rgba(15, 23, 42, 0.16)" : "none",
-          }}
-        >
-          Weiter →
-        </button>
-      </div>
+        <section className="registration-panel">
+          {submitState === "success" ? (
+            <div className="success-state">
+              <div className="success-state__icon">
+                <Icon name="check_circle" />
+              </div>
+              <h2>Projekt-Leitfaden abgeschlossen.</h2>
+              <p>
+                Eure Eingaben wurden für diesen Prototyp strukturiert
+                zusammengefasst. In der vollständigen Plattform würde euer
+                Projekt jetzt in der EDUSTAIN-Community sichtbar werden.
+              </p>
 
-      <div style={{ textAlign: "center", marginTop: 32, color: "#6b7280", fontSize: 11 }}>
-        Hackathon Konzept · EdustainConnect.org
+              <div
+                className="guideline-summary-card"
+                style={{ textAlign: "left" }}
+              >
+                <h3>Zusammenfassung</h3>
+                <div className="guideline-summary-grid">
+                  <span>Status</span>
+                  <strong>
+                    {
+                      PROJECT_STATUS_OPTIONS.find(
+                        (entry) => entry.value === formData.projectStatus,
+                      )?.title
+                    }
+                  </strong>
+
+                  <span>Sichtbarkeit</span>
+                  <strong>
+                    {
+                      VISIBILITY_OPTIONS.find(
+                        (entry) => entry.value === formData.visibility,
+                      )?.title
+                    }
+                  </strong>
+
+                  <span>Projektname</span>
+                  <strong>{formData.projectName}</strong>
+
+                  <span>Bundesland</span>
+                  <strong>{formData.state}</strong>
+
+                  <span>Teaser</span>
+                  <strong>{formData.teaser}</strong>
+
+                  <span>Ansprechpartner*in</span>
+                  <strong>
+                    {formData.contactName}
+                    {formData.contactEmail
+                      ? ` · ${formData.contactEmail}`
+                      : ""}
+                    {formData.contactPhone
+                      ? ` · ${formData.contactPhone}`
+                      : ""}
+                  </strong>
+
+                  <span>Navigator-Karten</span>
+                  <strong>
+                    {formData.navigatorCards.length > 0
+                      ? formData.navigatorCards.join(", ")
+                      : "—"}
+                  </strong>
+
+                  <span>Laufzeit</span>
+                  <strong>
+                    {formData.timeline ? (
+                      formData.timeline
+                    ) : (
+                      <em>Keine Angabe</em>
+                    )}
+                  </strong>
+
+                  <span>OKR Set</span>
+                  <strong>
+                    {formData.okrSet ? (
+                      formData.okrSet
+                    ) : (
+                      <em>Keine Angabe</em>
+                    )}
+                  </strong>
+
+                  <span>Beteiligte</span>
+                  <strong>{formData.participants.join(", ")}</strong>
+
+                  <span>Durchführung</span>
+                  <strong>
+                    {
+                      EXECUTION_OPTIONS.find(
+                        (entry) => entry.value === formData.execution,
+                      )?.title
+                    }
+                    {formData.executionPartners
+                      ? ` · ${formData.executionPartners}`
+                      : ""}
+                  </strong>
+
+                  <span>Finanzierung</span>
+                  <strong>
+                    {
+                      FUNDING_OPTIONS.find(
+                        (entry) => entry.value === formData.funding,
+                      )?.title
+                    }
+                  </strong>
+
+                  <span>Learnings</span>
+                  <strong>
+                    {formData.learnings ? (
+                      formData.learnings
+                    ) : (
+                      <em>Keine Angabe</em>
+                    )}
+                  </strong>
+                </div>
+              </div>
+
+              <div className="registration-actions__cluster">
+                <button
+                  className="button button--ghost"
+                  onClick={handleReset}
+                  type="button"
+                >
+                  <Icon name="refresh" />
+                  <span>Neuen Leitfaden starten</span>
+                </button>
+              </div>
+            </div>
+          ) : (
+            <form className="registration-form" onSubmit={handleSubmit}>
+              <div className="registration-form__header">
+                <div>
+                  <p className="registration-form__step-label">
+                    Schritt {currentStep + 1} von {STEPS.length}
+                  </p>
+                  <h2>{STEPS[currentStep].label}</h2>
+                </div>
+                <div className="registration-progress">
+                  <div
+                    className="registration-progress__bar"
+                    style={{
+                      width: `${((currentStep + 1) / STEPS.length) * 100}%`,
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* ======================== SCHRITT 1: BASIS ======================== */}
+              {currentStep === 0 && (
+                <div className="registration-fields">
+                  <div className="field-block">
+                    <label>Projekt-Status</label>
+                    <p className="field-help">
+                      Wählt aus, ob euer Projekt oder Konzept gerade läuft oder
+                      bereits abgeschlossen ist.
+                    </p>
+                    <div className="option-cards">
+                      {PROJECT_STATUS_OPTIONS.map((option) => (
+                        <button
+                          key={option.value}
+                          type="button"
+                          className={`option-card${
+                            formData.projectStatus === option.value
+                              ? " is-active"
+                              : ""
+                          }`}
+                          onClick={() =>
+                            setFieldValue("projectStatus", option.value)
+                          }
+                        >
+                          <span className="option-card__head">
+                            <Icon name={option.icon} />
+                            {option.title}
+                          </span>
+                          <span>{option.description}</span>
+                        </button>
+                      ))}
+                    </div>
+                    {renderError("projectStatus")}
+                  </div>
+
+                  <div className="field-block">
+                    <label>Sichtbarkeit</label>
+                    <p className="field-help">
+                      Bestimmt, ob euer Projekt für die gesamte
+                      EDUSTAIN-Community sichtbar ist oder vorerst nur intern.
+                    </p>
+                    <div className="option-cards">
+                      {VISIBILITY_OPTIONS.map((option) => (
+                        <button
+                          key={option.value}
+                          type="button"
+                          className={`option-card${
+                            formData.visibility === option.value
+                              ? " is-active"
+                              : ""
+                          }`}
+                          onClick={() =>
+                            setFieldValue("visibility", option.value)
+                          }
+                        >
+                          <span className="option-card__head">
+                            <Icon name={option.icon} />
+                            {option.title}
+                          </span>
+                          <span>{option.description}</span>
+                        </button>
+                      ))}
+                    </div>
+                    {renderError("visibility")}
+                  </div>
+
+                  <div className="field-block">
+                    <label htmlFor="projectName">Projektname</label>
+                    <p className="field-help">
+                      Gebt eurem Projekt oder Konzept einen Titel mit maximal{" "}
+                      {MAX_NAME} Zeichen.
+                    </p>
+                    <input
+                      id="projectName"
+                      name="projectName"
+                      value={formData.projectName}
+                      onChange={handleFieldChange}
+                      onBlur={handleFieldBlur}
+                      maxLength={MAX_NAME}
+                      placeholder="Wie heißt euer Projekt/Konzept?"
+                    />
+                    <div className="field-meta">
+                      <span />
+                      <span
+                        className={charCountClass(
+                          formData.projectName.length,
+                          MAX_NAME,
+                        )}
+                      >
+                        {formData.projectName.length}/{MAX_NAME} Zeichen
+                      </span>
+                    </div>
+                    {renderError("projectName")}
+                  </div>
+
+                  <div className="field-block">
+                    <label htmlFor="state">Bundesland</label>
+                    <div className="select-wrap">
+                      <select
+                        id="state"
+                        name="state"
+                        value={formData.state}
+                        onChange={handleFieldChange}
+                        onBlur={handleFieldBlur}
+                      >
+                        <option value="">Bitte wählen …</option>
+                        {STATES.map((state) => (
+                          <option key={state} value={state}>
+                            {state}
+                          </option>
+                        ))}
+                      </select>
+                      <Icon name="chevron_right" />
+                    </div>
+                    {renderError("state")}
+                  </div>
+                </div>
+              )}
+
+              {/* ======================== SCHRITT 2: VORSTELLUNG ======================== */}
+              {currentStep === 1 && (
+                <div className="registration-fields">
+                  <div className="field-block">
+                    <label>Titelbild</label>
+                    <p className="field-help">
+                      Ladet hier ein aussagekräftiges Titelbild für euer
+                      Projekt oder Konzept hoch. Achtet dabei unbedingt darauf,
+                      dass alle abgebildeten Personen ihr Einverständnis gegeben
+                      haben (Datenschutz).
+                    </p>
+                    <div className="upload-box" aria-hidden>
+                      <Icon name="cloud_upload" />
+                      <strong>Titelbild ablegen oder auswählen</strong>
+                      <small>
+                        JPG oder PNG, empfohlen 1600 × 900 px. Im Prototyp wird
+                        kein Bild tatsächlich hochgeladen.
+                      </small>
+                    </div>
+                  </div>
+
+                  <div className="field-block">
+                    <label htmlFor="teaser">Kurzbeschreibung (Teaser)</label>
+                    <p className="field-help">
+                      Beschreibt den Kerninhalt eures Projekts in maximal{" "}
+                      {MAX_TEASER} Zeichen. Der Teaser wird in der Vorschau
+                      zusammen mit dem Projekttitel angezeigt.
+                    </p>
+                    <textarea
+                      id="teaser"
+                      name="teaser"
+                      value={formData.teaser}
+                      onChange={handleFieldChange}
+                      onBlur={handleFieldBlur}
+                      maxLength={MAX_TEASER}
+                      rows={3}
+                      placeholder="Kerninhalt eures Projekts/Konzepts in max 200 Zeichen"
+                    />
+                    <div className="field-meta">
+                      <span />
+                      <span
+                        className={charCountClass(
+                          formData.teaser.length,
+                          MAX_TEASER,
+                        )}
+                      >
+                        {formData.teaser.length}/{MAX_TEASER} Zeichen
+                      </span>
+                    </div>
+                    {renderError("teaser")}
+                  </div>
+
+                  <div className="field-block">
+                    <label htmlFor="contactName">
+                      Ansprechpartner*in (Vor- und Nachname)
+                    </label>
+                    <p className="field-help">
+                      Wer ist die Hauptansprechpartner*in für das Projekt oder
+                      Konzept?
+                    </p>
+                    <input
+                      id="contactName"
+                      name="contactName"
+                      value={formData.contactName}
+                      onChange={handleFieldChange}
+                      onBlur={handleFieldBlur}
+                      placeholder="Vor- und Nachname"
+                    />
+                    {renderError("contactName")}
+                  </div>
+
+                  <div className="field-row field-row--double">
+                    <div className="field-block">
+                      <label htmlFor="contactEmail">
+                        E-Mail-Adresse (optional)
+                      </label>
+                      <p className="field-help">
+                        Damit andere Schulen euch direkt kontaktieren können.
+                      </p>
+                      <input
+                        id="contactEmail"
+                        name="contactEmail"
+                        type="email"
+                        value={formData.contactEmail}
+                        onChange={handleFieldChange}
+                        onBlur={handleFieldBlur}
+                        placeholder="kontakt@schule.de"
+                      />
+                      {renderError("contactEmail")}
+                    </div>
+
+                    <div className="field-block">
+                      <label htmlFor="contactPhone">
+                        Telefonnummer (optional)
+                      </label>
+                      <p className="field-help">
+                        Die Telefonnummer ist für alle Nutzer*innen der
+                        Community sichtbar.
+                      </p>
+                      <input
+                        id="contactPhone"
+                        name="contactPhone"
+                        type="tel"
+                        value={formData.contactPhone}
+                        onChange={handleFieldChange}
+                        onBlur={handleFieldBlur}
+                        placeholder="+49 …"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* ======================== SCHRITT 3: VERORTUNG ======================== */}
+              {currentStep === 2 && (
+                <div className="registration-fields">
+                  <div className="field-block">
+                    <label>Zugehörige Navigator-Karte(n)</label>
+                    <p className="field-help">
+                      Wählt passende Handlungsfelder aus dem Whole School
+                      Approach, die euer Projekt inhaltlich verankern.
+                      Mehrfachauswahl möglich.
+                    </p>
+                    <div className="navigator-card-list">
+                      {NAVIGATOR_CARDS.map((item, index) => {
+                        const isActive = formData.navigatorCards.includes(
+                          item.title,
+                        );
+                        return (
+                          <button
+                            type="button"
+                            key={item.title}
+                            className={`navigator-card-toggle${
+                              isActive ? " is-active" : ""
+                            }`}
+                            onClick={() =>
+                              toggleArrayValue("navigatorCards", item.title)
+                            }
+                          >
+                            <span className="navigator-card-toggle__index">
+                              {index + 1}
+                            </span>
+                            <span className="navigator-card-toggle__text">
+                              <strong>{item.title}</strong>
+                              <span>{item.description}</span>
+                            </span>
+                            <Icon name="check_circle" />
+                          </button>
+                        );
+                      })}
+                    </div>
+                    {renderError("navigatorCards")}
+                  </div>
+
+                  <div className="field-block">
+                    <label htmlFor="okrSet">
+                      Zugehöriges OKR Set (optional)
+                    </label>
+                    <p className="field-help">
+                      Tragt hier — wenn vorhanden — euer zugehöriges OKR Set
+                      ein (1 Objective + 3–5 Key Results).
+                    </p>
+                    <textarea
+                      id="okrSet"
+                      name="okrSet"
+                      value={formData.okrSet}
+                      onChange={handleFieldChange}
+                      onBlur={handleFieldBlur}
+                      rows={4}
+                      placeholder="Objective: …&#10;Key Result 1: …&#10;Key Result 2: …"
+                    />
+                  </div>
+
+                  <div className="field-block">
+                    <label htmlFor="timeline">
+                      Projektlaufzeit und Meilensteine (optional)
+                    </label>
+                    <p className="field-help">
+                      In welchem Zeitraum wird / wurde das Projekt umgesetzt?
+                      Bei einem etablierten Konzept: Seit wann arbeitet ihr
+                      damit? Welche Meilensteine gibt es?
+                    </p>
+                    <textarea
+                      id="timeline"
+                      name="timeline"
+                      value={formData.timeline}
+                      onChange={handleFieldChange}
+                      onBlur={handleFieldBlur}
+                      rows={3}
+                      placeholder="z. B. Seit Schuljahr 2023/24 · Kickoff · Pilotphase · Evaluation …"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* ======================== SCHRITT 4: INHALT ======================== */}
+              {currentStep === 3 && (
+                <div className="registration-fields">
+                  <div className="field-block">
+                    <label htmlFor="description">Projektbeschreibung</label>
+                    <p className="field-help">
+                      Beschreibt hier euer Projekt oder Konzept im Detail: Was
+                      wird/wurde gemacht? Wie sieht das Konzept aus? Wie seid
+                      ihr vorgegangen? Was soll erreicht werden / wurde
+                      erreicht?
+                    </p>
+                    <textarea
+                      id="description"
+                      name="description"
+                      value={formData.description}
+                      onChange={handleFieldChange}
+                      onBlur={handleFieldBlur}
+                      rows={8}
+                      placeholder="Beschreibt Ziel, Vorgehen und Wirkung eures Projekts oder Konzepts."
+                    />
+                    {renderError("description")}
+                  </div>
+
+                  <div className="field-block">
+                    <label htmlFor="learnings">Learnings (optional)</label>
+                    <p className="field-help">
+                      Was waren besondere Herausforderungen? Eher Best Practice
+                      oder Fuck-Up-Story? Was hat besonders zum Erfolg
+                      beigetragen? Eure Erfahrungen helfen anderen Schulen.
+                    </p>
+                    <textarea
+                      id="learnings"
+                      name="learnings"
+                      value={formData.learnings}
+                      onChange={handleFieldChange}
+                      onBlur={handleFieldBlur}
+                      rows={6}
+                      placeholder="Stolpersteine, Aha-Momente, Erfolgsfaktoren …"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* ======================== SCHRITT 5: ORGANISATION ======================== */}
+              {currentStep === 4 && (
+                <div className="registration-fields">
+                  <div className="field-block">
+                    <label>Beteiligte</label>
+                    <p className="field-help">
+                      Wer ist/war alles am Projekt oder Konzept beteiligt?
+                      Mehrfachauswahl möglich.
+                    </p>
+                    <div className="chip-group">
+                      {PARTICIPANTS.map((entry) => {
+                        const isActive =
+                          formData.participants.includes(entry);
+                        return (
+                          <button
+                            type="button"
+                            key={entry}
+                            className={`chip-toggle${
+                              isActive ? " is-active" : ""
+                            }`}
+                            onClick={() =>
+                              toggleArrayValue("participants", entry)
+                            }
+                          >
+                            {isActive && <Icon name="check" />}
+                            {entry}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    {renderError("participants")}
+                  </div>
+
+                  <div className="field-block">
+                    <label>Projekt-Durchführung</label>
+                    <p className="field-help">
+                      Wer führt das Projekt konkret durch? Damit andere Schulen
+                      einschätzen können, ob sie Vergleichbares intern oder mit
+                      Partnern aufsetzen können.
+                    </p>
+                    <div className="option-cards">
+                      {EXECUTION_OPTIONS.map((option) => (
+                        <button
+                          key={option.value}
+                          type="button"
+                          className={`option-card${
+                            formData.execution === option.value
+                              ? " is-active"
+                              : ""
+                          }`}
+                          onClick={() =>
+                            setFieldValue("execution", option.value)
+                          }
+                        >
+                          <span className="option-card__head">
+                            <Icon name={option.icon} />
+                            {option.title}
+                          </span>
+                          <span>{option.description}</span>
+                        </button>
+                      ))}
+                    </div>
+                    {renderError("execution")}
+                  </div>
+
+                  <div className="field-block">
+                    <label htmlFor="executionPartners">
+                      Externe Partner benennen (optional)
+                    </label>
+                    <p className="field-help">
+                      Falls externe Partner beteiligt sind: Wer führt konkret
+                      mit durch? Nennt NGOs, Vereine, Bildungsträger oder
+                      kooperierende Schulen.
+                    </p>
+                    <input
+                      id="executionPartners"
+                      name="executionPartners"
+                      value={formData.executionPartners}
+                      onChange={handleFieldChange}
+                      onBlur={handleFieldBlur}
+                      placeholder="z. B. NABU Ortsgruppe, GartenWerkStadt e.V., Grundschule Süd"
+                    />
+                  </div>
+
+                  <div className="field-block">
+                    <label>Finanzierung</label>
+                    <p className="field-help">
+                      Wie ist das Projekt finanziert?
+                    </p>
+                    <div className="option-cards">
+                      {FUNDING_OPTIONS.map((option) => (
+                        <button
+                          key={option.value}
+                          type="button"
+                          className={`option-card${
+                            formData.funding === option.value
+                              ? " is-active"
+                              : ""
+                          }`}
+                          onClick={() => setFieldValue("funding", option.value)}
+                        >
+                          <span className="option-card__head">
+                            <Icon name={option.icon} />
+                            {option.title}
+                          </span>
+                          <span>{option.description}</span>
+                        </button>
+                      ))}
+                    </div>
+                    {renderError("funding")}
+                  </div>
+
+                  <div className="field-block">
+                    <label>Bildergalerie (optional)</label>
+                    <p className="field-help">
+                      Ladet hier aussagekräftige Bilder über euer Projekt hoch.
+                      Achtet bitte unbedingt auf den Datenschutz aller
+                      abgebildeten Personen.
+                    </p>
+                    <div className="upload-box" aria-hidden>
+                      <Icon name="photo_library" />
+                      <strong>Mehrere Bilder ablegen oder auswählen</strong>
+                      <small>
+                        JPG oder PNG. Im Prototyp wird kein Bild tatsächlich
+                        hochgeladen.
+                      </small>
+                    </div>
+                  </div>
+
+                  <div className="legal-card">
+                    <h3>Bereit zur Veröffentlichung</h3>
+                    <p>
+                      Mit dem Abschluss des Leitfadens wird euer Projekt im
+                      Prototyp zusammengefasst. Auf der vollständigen
+                      EDUSTAIN-Plattform würde es damit in der Community
+                      sichtbar werden — sichtbar für andere Schulen, die von
+                      euch lernen möchten.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              <div className="registration-actions">
+                <button
+                  className="button button--ghost"
+                  onClick={handleReset}
+                  type="button"
+                >
+                  <Icon name="restart_alt" />
+                  <span>Zurücksetzen</span>
+                </button>
+
+                <div className="registration-actions__cluster">
+                  {currentStep > 0 && (
+                    <button
+                      className="button button--ghost"
+                      onClick={handleBack}
+                      type="button"
+                    >
+                      <Icon name="chevron_left" />
+                      <span>Zurück</span>
+                    </button>
+                  )}
+
+                  {currentStep < STEPS.length - 1 ? (
+                    <button
+                      className="button button--primary"
+                      onClick={handleNext}
+                      type="button"
+                      disabled={!isCurrentStepValid}
+                    >
+                      <span>Weiter</span>
+                      <Icon name="arrow_forward" />
+                    </button>
+                  ) : (
+                    <button
+                      className="button button--primary"
+                      type="submit"
+                      disabled={!isCurrentStepValid}
+                    >
+                      <span>Leitfaden abschließen</span>
+                      <Icon name="check_circle" />
+                    </button>
+                  )}
+                </div>
+              </div>
+            </form>
+          )}
+        </section>
       </div>
     </div>
   );
