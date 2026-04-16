@@ -491,6 +491,214 @@ select {
   font-family: "Montserrat", sans-serif;
 }
 
+.platform-pathways {
+  padding-top: 4rem;
+}
+
+.platform-pathways__intro {
+  max-width: 760px;
+  margin-bottom: 1.75rem;
+}
+
+.platform-pathways__eyebrow,
+.navigator-showcase__eyebrow,
+.pathway-card__eyebrow,
+.navigator-showcase__aside-label {
+  display: inline-flex;
+  width: fit-content;
+  padding: 0.38rem 0.75rem;
+  border-radius: 999px;
+  background: #edf6ee;
+  color: #2f8f3a;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+}
+
+.platform-pathways__intro h2 {
+  margin: 0.95rem 0 1rem;
+  font-family: "Montserrat", sans-serif;
+  font-size: clamp(2rem, 4vw, 2.9rem);
+  line-height: 1.08;
+}
+
+.platform-pathways__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+.pathway-card {
+  position: relative;
+  border-radius: 30px;
+  padding: 1.5rem;
+  border: 1px solid #dbe4ee;
+  box-shadow: 0 22px 48px rgba(15, 23, 42, 0.06);
+  overflow: hidden;
+}
+
+.pathway-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto auto 0;
+  width: 100%;
+  height: 110px;
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+.pathway-card--provider {
+  background: linear-gradient(180deg, #f6fbf7, #ffffff 42%);
+}
+
+.pathway-card--provider::before {
+  background: radial-gradient(circle at top left, rgba(47, 143, 58, 0.14), transparent 58%);
+}
+
+.pathway-card--program {
+  background: linear-gradient(180deg, #f5f9ff, #ffffff 42%);
+}
+
+.pathway-card--program::before {
+  background: radial-gradient(circle at top left, rgba(0, 119, 182, 0.16), transparent 58%);
+}
+
+.pathway-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.pathway-card__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 18px;
+  margin-bottom: 1rem;
+  background: #ffffff;
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.08);
+}
+
+.pathway-card h3 {
+  margin: 0.95rem 0 0.7rem;
+  font-family: "Montserrat", sans-serif;
+  font-size: 1.55rem;
+  line-height: 1.14;
+}
+
+.pathway-card__chips,
+.navigator-showcase__highlights {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.pathway-card__chips {
+  margin: 1rem 0 1.15rem;
+}
+
+.pathway-card__chips span,
+.navigator-showcase__highlights span {
+  display: inline-flex;
+  padding: 0.45rem 0.8rem;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 1px solid #dbe4ee;
+  color: #111827;
+  font-weight: 700;
+  font-size: 0.92rem;
+}
+
+.pathway-card__contact {
+  margin: 1rem 0 1.2rem;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.pathway-card__contact strong {
+  font-family: "Montserrat", sans-serif;
+}
+
+.pathway-card__contact a,
+.pathway-card__contact span {
+  color: #374151;
+}
+
+.pathway-card__cta {
+  box-shadow: 0 16px 35px rgba(15, 23, 42, 0.12);
+}
+
+.navigator-showcase {
+  padding-top: 4rem;
+}
+
+.navigator-showcase__header {
+  max-width: 780px;
+  margin-bottom: 1.75rem;
+}
+
+.navigator-showcase__header h2 {
+  margin: 0.95rem 0 1rem;
+  font-family: "Montserrat", sans-serif;
+  font-size: clamp(2rem, 4vw, 2.9rem);
+  line-height: 1.08;
+}
+
+.navigator-showcase__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(260px, 0.8fr);
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.navigator-showcase__steps {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.navigator-step-card {
+  min-height: 100%;
+  border-radius: 24px;
+  background: #ffffff;
+  border: 1px solid #dbe4ee;
+  padding: 1.2rem;
+  box-shadow: 0 18px 38px rgba(15, 23, 42, 0.05);
+}
+
+.navigator-step-card strong {
+  display: block;
+  margin-bottom: 0.45rem;
+  color: #111827;
+  font-family: "Montserrat", sans-serif;
+  line-height: 1.2;
+}
+
+.navigator-step-card p {
+  color: #4b5563;
+}
+
+.navigator-showcase__aside-card {
+  position: sticky;
+  top: 108px;
+  border-radius: 28px;
+  background: linear-gradient(180deg, #f8fbff, #ffffff);
+  border: 1px solid #dbe4ee;
+  padding: 1.3rem;
+  box-shadow: 0 22px 48px rgba(15, 23, 42, 0.06);
+}
+
+.navigator-showcase__aside-card h3 {
+  margin: 0.95rem 0 0.8rem;
+  font-family: "Montserrat", sans-serif;
+  font-size: 1.5rem;
+  line-height: 1.14;
+}
+
+.navigator-showcase__highlights {
+  margin: 1.15rem 0 1.2rem;
+}
+
 .registration-card__header {
   display: flex;
   align-items: center;
@@ -1576,6 +1784,9 @@ select {
     grid-template-columns: 1fr;
   }
 
+  .platform-pathways__grid,
+  .navigator-showcase__layout,
+  .navigator-showcase__steps,
   .registration-cta-card,
   .registration-layout,
   .member-hero,
@@ -1589,6 +1800,10 @@ select {
   }
 
   .registration-sidebar {
+    position: static;
+  }
+
+  .navigator-showcase__aside-card {
     position: static;
   }
 
@@ -1627,6 +1842,12 @@ select {
 
   .workflow-register-link {
     display: none;
+  }
+
+  .pathway-card,
+  .navigator-step-card,
+  .navigator-showcase__aside-card {
+    padding: 1.1rem;
   }
 
   .personalized-start__top,

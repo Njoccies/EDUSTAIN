@@ -120,72 +120,109 @@ export default function WebsiteHome({
           </div>
         </section>
 
-        <section className="content-section content-section--tight">
-          <h2>Ihr seid Anbieter eines BNE Lernorts für Schulen oder bietet BNE Dienstleistungen für Schulen an?</h2>
-          <p>
-            Wir wollen auf dieser Plattform demnächst auch BNE Anbieter mit Schulen vernetzen.
-          </p>
-          <p>
-            Wenn ihr als BNE Anbieter Interesse zur Aufnahme auf die Plattform habt, merkt euch hier
-            unverbindlich vor. Wir melden uns dann mit weiteren Informationen bei euch, sobald wir
-            soweit sind.
-          </p>
-          <button className="button button--ghost" type="button">
-            <Icon name="edit" />
-            <span>Unverbindliche Vormerkung</span>
-          </button>
-        </section>
-
-        <section className="content-section content-section--tight">
-          <h2>Nutzung der Plattform in eurem WSA Bildungsprogramm</h2>
-          <p>
-            Ihr möchtet als Schulträger, Kultusministerium, Verein, NGO o. ä. die Plattform für
-            euer Projekt/Programm zum Whole School Approach nutzen oder uns bei der
-            Weiterentwicklung unterstützen? Dann kontaktiert uns!
-          </p>
-          <div className="contact-card">
-            <p className="contact-card__title">EDUSTAIN</p>
+        <section className="content-section content-section--bordered platform-pathways">
+          <div className="platform-pathways__intro">
+            <p className="platform-pathways__eyebrow">Zusammenarbeit mit EDUSTAIN</p>
+            <h2>Für Anbieter, Programme und wirksame Schulentwicklung</h2>
             <p>
-              E-Mail:{" "}
-              <a href="mailto:support@edustainconnect.org">support@edustainconnect.org</a>
+              EDUSTAIN Connect soll Schulen, BNE-Anbieter und Programme in einer gemeinsamen,
+              praxisnahen Struktur zusammenbringen. So entstehen passende Kontakte, klare Einstiege
+              und anschlussfähige Entwicklungspfade.
             </p>
-            <p>
-              Webseite:{" "}
-              <a href="https://www.edustain.org" target="_blank" rel="noreferrer">
-                www.edustain.org
-              </a>
-            </p>
-            <p>Fortbildungen | Workshops | Vorträge | Coaching</p>
           </div>
-          <a className="button button--ghost" href="mailto:support@edustainconnect.org">
-            <Icon name="mail" />
-            <span>Kontaktiere uns</span>
-          </a>
+
+          <div className="platform-pathways__grid">
+            <article className="pathway-card pathway-card--provider">
+              <div className="pathway-card__icon">
+                <Icon name="storefront" />
+              </div>
+              <p className="pathway-card__eyebrow">Für Anbieter</p>
+              <h3>BNE-Angebote sichtbar machen</h3>
+              <p>
+                Ihr bietet Lernorte, Workshops oder Dienstleistungen für Schulen an? Dann merkt euch
+                unverbindlich vor. Wir informieren euch, sobald die Aufnahme auf die Plattform
+                startet.
+              </p>
+              <div className="pathway-card__chips">
+                <span>Lernorte</span>
+                <span>Workshops</span>
+                <span>Dienstleistungen</span>
+              </div>
+              <button className="button button--ghost" type="button">
+                <Icon name="edit" />
+                <span>Unverbindlich vormerken</span>
+              </button>
+            </article>
+
+            <article className="pathway-card pathway-card--program">
+              <div className="pathway-card__icon">
+                <Icon name="hub" />
+              </div>
+              <p className="pathway-card__eyebrow">Für Programme & Träger</p>
+              <h3>EDUSTAIN Connect im Bildungsprogramm nutzen</h3>
+              <p>
+                Ihr möchtet die Plattform für ein WSA-Bildungsprogramm einsetzen oder ihre
+                Weiterentwicklung unterstützen? Dann lasst uns ins Gespräch kommen.
+              </p>
+              <div className="pathway-card__contact">
+                <strong>EDUSTAIN</strong>
+                <a href="mailto:support@edustainconnect.org">support@edustainconnect.org</a>
+                <a href="https://www.edustain.org" target="_blank" rel="noreferrer">
+                  www.edustain.org
+                </a>
+                <span>Fortbildungen | Workshops | Vorträge | Coaching</span>
+              </div>
+              <a className="button button--primary pathway-card__cta" href="mailto:support@edustainconnect.org">
+                <Icon name="mail" />
+                <span>Kontakt aufnehmen</span>
+              </a>
+            </article>
+          </div>
         </section>
 
-        <section className="content-section content-section--bordered" ref={navigationRef} id="navigation">
-          <h2>Der Weg ist das Ziel - Das #EDUSTAIN Navigationssystem</h2>
-          <p>
-            Bei BNE im Whole School Approach geht es darum, in kleinen kontinuierlichen Schritten in
-            Richtung einer nachhaltigen Entwicklung zu gehen - EDUSTAIN begleitet mit verschiedenen
-            Bausteinen durch diesen WSA Entwicklungszyklus auf dem Weg von einem Lernort zu einem
-            nachhaltigen Lebensraum:
-          </p>
-          <ul className="bullet-list">
-            {NAVIGATION_SYSTEM_ITEMS.map((item) => (
-              <li key={item.title}>
-                <strong>{item.title}</strong> {item.description}
-              </li>
-            ))}
-          </ul>
-          <p>
-            Unsere Bausteine basieren auf bewährten Methoden aus Pädagogik, Wirtschaft und
-            Nachhaltigkeitswissenschaft und sind speziell auf die Praxis von Schulen angepasst.
-          </p>
-          <p>
-            Sprecht uns einfach an wenn ihr mehr erfahren möchtet:{" "}
-            <a href="mailto:info@edustain.org">info@edustain.org</a>
-          </p>
+        <section className="content-section navigator-showcase" ref={navigationRef} id="navigation">
+          <div className="navigator-showcase__header">
+            <p className="navigator-showcase__eyebrow">#EDUSTAIN Navigationssystem</p>
+            <h2>Schulentwicklung in klaren, machbaren Etappen</h2>
+            <p>
+              Whole School Approach entsteht nicht in einem großen Sprung, sondern in kleinen,
+              kontinuierlichen Schritten. EDUSTAIN verbindet dafür Orientierung, Analyse,
+              Vernetzung und Begleitung zu einem praxistauglichen Entwicklungszyklus.
+            </p>
+          </div>
+
+          <div className="navigator-showcase__layout">
+            <div className="navigator-showcase__steps">
+              {NAVIGATION_SYSTEM_ITEMS.map((item) => (
+                <article key={item.title} className="navigator-step-card">
+                  <strong>{item.title}</strong>
+                  <p>{item.description}</p>
+                </article>
+              ))}
+            </div>
+
+            <aside className="navigator-showcase__aside">
+              <div className="navigator-showcase__aside-card">
+                <p className="navigator-showcase__aside-label">Begleitung durch EDUSTAIN</p>
+                <h3>Von der Standortbestimmung bis zur Reflexion</h3>
+                <p>
+                  Unsere Bausteine basieren auf bewährten Methoden aus Pädagogik, Wirtschaft und
+                  Nachhaltigkeitswissenschaft und sind gezielt auf die Praxis von Schulen
+                  zugeschnitten.
+                </p>
+                <div className="navigator-showcase__highlights">
+                  <span>Orientierung</span>
+                  <span>Roadmaps</span>
+                  <span>Coaching</span>
+                  <span>Kollegiale Beratung</span>
+                </div>
+                <a className="button button--ghost" href="mailto:info@edustain.org">
+                  <Icon name="north_east" />
+                  <span>Mehr erfahren</span>
+                </a>
+              </div>
+            </aside>
+          </div>
         </section>
       </main>
 
